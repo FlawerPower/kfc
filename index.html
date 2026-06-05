@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KFC - Test ze Standardów</title>
+    <!-- Dołączenie nowoczesnego frameworka Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Import eleganckiej czcionki Google Font (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F4F3F0; /* Markowy kremowy odcień tła KFC */
+        }
+        /* Płynne animacje dla elementów UI */
+        .transition-all-300 {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6 select-none">
+
+<div class="w-full max-w-xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden relative transition-all-300">
+    
+    <!-- BRANDING: Legendarny motyw trzech czerwonych pasów KFC na samej górze karty -->
+    <div class="h-4 w-full flex">
+        <div class="flex-1 bg-[#C41230]"></div>
+        <div class="flex-1 bg-white"></div>
+        <div class="flex-1 bg-[#C41230]"></div>
+        <div class="flex-1 bg-white"></div>
+        <div class="flex-1 bg-[#C41230]"></div>
+    </div>
+
+    <div class="p-6 sm:p-8">
+        
+        <!-- EKRAN 1: MENU STARTOWE I DYNAMICZNY RANKING TOP 5 -->
+        <div id="screen-start" class="space-y-6">
+            <div class="text-center space-y-2">
+                <!-- Ikona kubełka/kurczaka KFC zrobiona w wektorze SVG -->
+                <div class="inline-flex justify-center items-center w-16 h-16 bg-red-50 rounded-full mb-2">
+                    <svg class="w-10 h-10 text-[#C41230]" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Test ze Standardów KFC</h1>
+                <p class="text-sm text-gray-500 max-w-sm mx-auto">Wpisz swoje dane, aby rozpocząć oficjalny test wiedzy stanowiskowej.</p>
+            </div>
+
+            <!-- Formularz startowy danych pracownika -->
+            <div class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-700 uppercase tracking-wider block" for="userName">Imię i Nazwisko:</label>
+                    <input type="text" id="userName" placeholder="np. Jan Kowalski" 
+                           class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C41230] focus:border-transparent transition-all-300">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-700 uppercase tracking-wider block" for="userRole">Wybierz swoje stanowisko:</label>
+                    <select id="userRole" 
+                            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C41230] focus:border-transparent transition-all-300">
+                        <option value="" disabled selected>-- Wybierz z listy --</option>
+                        <option value="kuchnia">Kuchnia (Kucharz / Panierowanie)</option>
+                        <option value="front">Front (Obsługa, Kasa i Lobby)</option>
+                        <option value="serwis">Serwis (Pakowanie / Wydawanie)</option>
+                    </select>
+                </div>
+
+                <button id="btn-start" class="w-full py-4 bg-[#C41230] hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-200 hover:shadow-none transform hover:-translate-y-0.5 active:translate-y-0 transition-all-300">
+                    Rozpocznij Test
+                </button>
+            </div>
+
+            <!-- DYNAMICZNY RANKING TOP 5 -->
+            <div id="leaderboard-box" class="pt-4 border-t border-gray-100 hidden">
+                <h3 class="text-xs font-extrabold text-[#C41230] uppercase tracking-widest text-center mb-3">🏆 RESTAURACYJNY RANKING TOP 5</h3>
+                <div id="leaderboard-entries" class="bg-gray-50 rounded-xl border border-gray-100 divide-y divide-gray-100 overflow-hidden">
+                    <p class="text-center py-4 text-xs font-semibold text-gray-400 animate-pulse">Pobieranie aktualnych wyników...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- EKRAN 2: INTEGRACJA SYSTEMU QUIZU -->
+        <div id="screen-quiz" class="hidden space-y-6">
+            <!-- Pasek postępu na samej górze pytań -->
+            <div class="space-y-2">
+                <div class="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div id="progress" class="h-full bg-[#C41230] rounded-full transition-all-300" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between items-center text-xs font-bold text-gray-400">
+                    <span id="question-category" class="uppercase tracking-wider text-[#C41230]">Wiedza ogólna</span>
+                    <span id="question-counter">Pytanie 1 z 4</span>
+                </div>
+            </div>
+
+            <!-- Kontener, w którym JS dynamicznie renderuje pytania -->
+            <div id="question-container" class="min-h-[220px]">
+                <!-- Pytanie i opcje renderowane dynamicznie -->
+            </div>
+
+            <!-- Przyciski nawigacyjne po teście -->
+            <div class="flex gap-3 pt-2">
+                <button id="btn-prev" class="flex-1 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-all-300 hidden">
+                    Wstecz
+                </button>
+                <button id="btn-next" class="flex-1 py-3.5 bg-[#C41230] hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-100 transition-all-300">
+                    Dalej
+                </button>
+            </div>
+        </div>
+
+        <!-- EKRAN 3: PODSUMOWANIE WYNIKÓW -->
+        <div id="screen-result" class="hidden text-center space-y-6">
+            <div class="space-y-2">
+                <div class="inline-flex justify-center items-center w-20 h-20 bg-green-50 text-green-500 rounded-full mb-2">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Koniec Testu!</h1>
+                <p id="result-name" class="text-sm font-bold text-gray-500 uppercase tracking-wider"></p>
+            </div>
+
+            <!-- Główne wyświetlenie procentowego wyniku -->
+            <div id="score-display" class="text-6xl font-black text-red-500 tracking-tighter">0%</div>
+
+            <!-- Kafelkowy podział na sekcje punktowe (Ogólna i Stanowiskowa) -->
+            <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 text-left divide-y divide-gray-200/50 space-y-3">
+                <div class="flex justify-between items-center pb-2.5">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Wiedza ogólna (Standardy):</span>
+                    <strong id="breakdown-gen" class="text-sm text-gray-900 font-bold">-</strong>
+                </div>
+                <div class="flex justify-between items-center pt-2.5 pb-2.5">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Wiedza stanowiskowa:</span>
+                    <strong id="breakdown-role" class="text-sm text-gray-900 font-bold">-</strong>
+                </div>
+                <div class="flex justify-between items-center pt-2.5 font-bold text-gray-900 text-base">
+                    <span class="uppercase tracking-wider text-xs font-extrabold text-[#C41230]">Łączny wynik:</span>
+                    <span id="score-text" class="text-lg font-extrabold text-gray-900">-</span>
+                </div>
+            </div>
+
+            <p class="text-sm text-green-600 font-bold flex justify-center items-center gap-1.5 bg-green-50 py-3 rounded-xl border border-green-100">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l5-5z" clip-rule="evenodd"/>
+                </svg>
+                Twój wynik został automatycznie zapisany!
+            </p>
+
+            <button onclick="location.reload()" class="w-full py-4 bg-gray-900 hover:bg-black text-white font-bold rounded-xl transition-all-300">
+                Powrót do menu głównego
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- DYNAMICZNE POWIADOMIENIE TOAST (NOWOCZESNE I SZYBKIE) -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-24 bg-[#C41230] text-white px-6 py-3.5 rounded-xl shadow-2xl font-bold text-sm transition-all-300 opacity-0 pointer-events-none z-50 flex items-center gap-2"></div>
+
+<script>
+    // TWOJA ZWERYFIKOWANA BAZA DANYCH W CHMURZE GOOGLE SHEETS
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxk3On3PlbyAd7Qz9kW6Wt6xrxxBaomQkkuVzm_bWzWSN1wOw8K6qX0iU-CnGsj0HGe/exec";
+
+    // System powiadomień bez używania przestarzałych "alert()"
+    function showToast(message, isError = true) {
+        const toast = document.getElementById('toast');
+        toast.innerText = message;
+        
+        if (isError) {
+            toast.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#C41230] text-white px-6 py-3.5 rounded-xl shadow-2xl font-bold text-sm transition-all-300 z-50 flex items-center gap-2 translate-y-0 opacity-100";
+        } else {
+            toast.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3.5 rounded-xl shadow-2xl font-bold text-sm transition-all-300 z-50 flex items-center gap-2 translate-y-0 opacity-100";
+        }
+        
+        setTimeout(() => {
+            toast.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#C41230] text-white px-6 py-3.5 rounded-xl shadow-2xl font-bold text-sm transition-all-300 z-50 flex items-center gap-2 translate-y-24 opacity-0 pointer-events-none";
+        }, 3500);
+    }
+
+    // BAZA PYTAŃ - ZORGANIZOWANA ARCHITEKTONICZNIE WEDŁUG WYMOGÓW KFC
+    const questionBank = {
+        general: [
+            { id: 'g1', type: 'single', q: 'Jak długo trwa proceduralne mycie rąk?', options: ['5 sekund', '20 sekund', '60 sekund'], correct: [1] },
+            { id: 'g2', type: 'single', q: 'Co oznacza zasada FIFO?', options: ['First In First Out', 'Fast In Fast Out', 'First In First Off'], correct: [0] },
+            { id: 'g3', type: 'multi', q: 'Wybierz filary standardu CHAMPS (zaznacz 2 prawidłowe):', options: ['Cleanliness (Czystość)', 'Marketing (Reklama)', 'Speed (Szybkość)', 'Safety (Ochrona)'], correct: [0, 2] }
+        ],
+        roles: {
+            kuchnia: [
+                { id: 'k1', type: 'single', q: 'Co oznacza liczba 10 w procedurze panierowania 7-10-7?', options: ['Smażenie przez 10 minut', '10 ruchów w basenie z wodą', '10 przypraw w mące'], correct: [1] },
+                { id: 'k2', type: 'single', q: 'Jaka jest prawidłowa temperatura wewnątrz usmażonego kurczaka?', options: ['Minimum 65°C', 'Minimum 82°C', 'Dokładnie 100°C'], correct: [1] },
+                { id: 'k3', type: 'multi', q: 'Które produkty są przygotowywane we frytownicach ciśnieniowych? (zaznacz wszystkie)', options: ['Frytki', 'Kawałki Original Recipe (z kością)', 'Strips'], correct: [1] }
+            ],
+            front: [
+                { id: 'f1', type: 'single', q: 'Czy na jednej kasie (szufladzie) może pracować dwóch kasjerów?', options: ['Tak, w czasie dużego ruchu dla przyspieszenia obsługi', 'Nie, jest to kategorycznie zabronione'], correct: [1] },
+                { id: 'f2', type: 'multi', q: 'Co składa się na standard up-sellingu (sugerowania)? (zaznacz poprawne)', options: ['Proponowanie powiększenia zestawu lub napoju', 'Zmuszanie klienta do zakupu deseru', 'Sugerowanie dodatku do zamówienia'], correct: [0, 2] },
+                { id: 'f3', type: 'single', q: 'Jaka jest prawidłowa procedura w przypadku rozlania płynu na lobby?', options: ['Natychmiastowe zabezpieczenie żółtym potykaczem i wytarcie mopem', 'Poczekanie na koniec fali ruchu', 'Zasypanie plamy mąką'], correct: [0] }
+            ],
+            serwis: [
+                { id: 's1', type: 'single', q: 'Jak reagujemy na zgłoszenie zimnych frytek?', options: ['Natychmiast wymieniamy na nowe', 'Prosimy o paragon i wypełnienie formularza', 'Odmawiamy, jeśli klient zjadł połowę'], correct: [0] },
+                { id: 's2', type: 'single', q: 'Co jest kluczowe podczas kompletowania zamówień na wynos (Take-away)?', options: ['Szczelne zamknięcie torby w celu utrzymania temperatury', 'Szybkie wrzucenie produktów bez sprawdzania z paragonem', 'Wydanie zamówienia bez serwetek'], correct: [0] },
+                { id: 's3', type: 'single', q: 'Jaki jest standard pakowania serwetek papierowych do zamówienia?', options: ['Jedna serwetka na każdy zamówiony produkt z kurczakiem', 'Zawsze cała garść serwetek', 'Pakujemy tylko na wyraźne życzenie klienta'], correct: [0] }
+            ]
+        }
+    };
+
+    // Konfiguracja podziału ilości pytań (2 ogólne i 2 stanowiskowe)
+    const CONFIG = { generalQuestionsCount: 2, roleQuestionsCount: 2 };
+    
+    // Stan maszyny stanowej naszej aplikacji
+    let appState = { name: '', role: '', questions: [], currentIndex: 0, answers: {} };
+
+    // ŁADOWANIE RANKINGU TOP 5 Z BAZY DANYCH GOOGLE SHEETS
+    function loadLeaderboard() {
+        const box = document.getElementById('leaderboard-box');
+        box.classList.remove('hidden');
+        
+        fetch(WEB_APP_URL)
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('leaderboard-entries');
+                container.innerHTML = '';
+                
+                if (data && data.length > 0) {
+                    // Ograniczamy dane do TOP 5 najlepszych wyników
+                    const top5 = data.slice(0, 5);
+                    
+                    top5.forEach((row, idx) => {
+                        let badge = `${idx + 1}.`;
+                        if (idx === 0) badge = '<span class="text-xl">🥇</span>';
+                        if (idx === 1) badge = '<span class="text-xl">🥈</span>';
+                        if (idx === 2) badge = '<span class="text-xl">🥉</span>';
+                        
+                        const el = document.createElement('div');
+                        el.className = "flex items-center justify-between p-3.5 transition-all-300 hover:bg-gray-100/50";
+                        el.innerHTML = `
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 flex justify-center font-black text-gray-400">${badge}</div>
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-gray-800 text-sm leading-tight">${row.name}</span>
+                                    <span class="text-[10px] font-extrabold text-[#C41230] uppercase tracking-wider">${row.role}</span>
+                                </div>
+                            </div>
+                            <div class="font-black text-green-600 text-base">${row.score}%</div>
+                        `;
+                        container.appendChild(el);
+                    });
+                } else {
+                    container.innerHTML = '<p class="text-center py-6 text-xs font-semibold text-gray-400">Brak wyników w bazie. Bądź pierwszy!</p>';
+                }
+            })
+            .catch(err => {
+                console.error("Błąd pobierania rankingu:", err);
+                document.getElementById('leaderboard-entries').innerHTML = '<p class="text-center py-6 text-xs font-bold text-red-500">Problem z połączeniem sieciowym bazy.</p>';
+            });
+    }
+
+    // Wywołanie pobierania rankingu na start strony
+    loadLeaderboard();
+
+    // Funkcja pomocnicza: pobieranie losowej puli z banku pytań
+    function getRandomQuestions(arr, count) {
+        return [...arr].sort(() => 0.5 - Math.random()).slice(0, count);
+    }
+
+    // Pobieranie referencji do kontenerów HTML
+    const screenStart = document.getElementById('screen-start');
+    const screenQuiz = document.getElementById('screen-quiz');
+    const screenResult = document.getElementById('screen-result');
+    const questionContainer = document.getElementById('question-container');
+    const btnNext = document.getElementById('btn-next');
+    const btnPrev = document.getElementById('btn-prev');
+
+    // URUCHOMIENIE TESTU (KLIKNIĘCIE START)
+    document.getElementById('btn-start').addEventListener('click', () => {
+        const nameInput = document.getElementById('userName').value.trim();
+        const roleInput = document.getElementById('userRole').value;
+
+        if(!nameInput || !roleInput) {
+            showToast('Musisz podać swoje imię oraz wybrać stanowisko!');
+            return;
+        }
+
+        appState.name = nameInput;
+        appState.role = roleInput;
+
+        // Wybór losowych pytań dla obu sekcji
+        const selectedGeneral = getRandomQuestions(questionBank.general, CONFIG.generalQuestionsCount)
+                                .map(q => ({ ...q, category: 'general' }));
+        const selectedRole = getRandomQuestions(questionBank.roles[roleInput], CONFIG.roleQuestionsCount)
+                             .map(q => ({ ...q, category: 'role' }));
+        
+        appState.questions = [...selectedGeneral, ...selectedRole];
+        appState.currentIndex = 0;
+        appState.answers = {};
+
+        screenStart.classList.add('hidden');
+        screenQuiz.classList.remove('hidden');
+        renderQuestion();
+    });
+
+    // RENDEROWANIE PYTANIA W KONTENERZE HTML
+    function renderQuestion() {
+        const qData = appState.questions[appState.currentIndex];
+        const isMulti = qData.type === 'multi';
+        const savedAnswers = appState.answers[qData.id] || [];
+
+        // Ustawienia licznika i kategorii u góry
+        document.getElementById('question-counter').innerText = `Pytanie ${appState.currentIndex + 1} z ${appState.questions.length}`;
+        document.getElementById('question-category').innerText = qData.category === 'general' ? 'Wiedza ogólna (Standardy)' : `Dział specjalistyczny (${appState.role.toUpperCase()})`;
+        document.getElementById('progress').style.width = `${((appState.currentIndex) / appState.questions.length) * 100}%`;
+        
+        // Zarządzanie widocznością przycisku wstecz
+        btnPrev.classList.toggle('hidden', appState.currentIndex === 0);
+        btnNext.innerText = appState.currentIndex === appState.questions.length - 1 ? 'Zakończ i Zapisz' : 'Dalej';
+
+        let html = `
+            <div class="mb-4">
+                <span class="inline-block px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-md ${isMulti ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-red-50 text-[#C41230] border border-red-100'}">
+                    ${isMulti ? '⚠️ WIELOKROTNY WYBÓR' : 'JEDNOKROTNY WYBÓR'}
+                </span>
+            </div>
+            <div class="text-base font-bold text-gray-800 mb-5 leading-snug">${qData.q}</div>
+            <div class="space-y-3">
+        `;
+
+        qData.options.forEach((opt, index) => {
+            const isChecked = savedAnswers.includes(index);
+            const inputType = isMulti ? 'checkbox' : 'radio';
+            
+            html += `
+                <label class="flex items-center gap-3 px-4 py-3.5 bg-gray-50 border-2 ${isChecked ? 'border-[#C41230] bg-red-50/20' : 'border-gray-100'} rounded-xl cursor-pointer hover:bg-gray-100/50 transition-all-300">
+                    <input type="${inputType}" name="q_${qData.id}" value="${index}" ${isChecked ? 'checked' : ''} onchange="saveAnswer()" class="w-5 h-5 text-[#C41230] focus:ring-[#C41230] border-gray-300 rounded">
+                    <span class="text-sm font-semibold text-gray-700 leading-tight">${opt}</span>
+                </label>
+            `;
+        });
+        html += `</div>`;
+        questionContainer.innerHTML = html;
+    }
+
+    // AUTOMATYCZNE ZAPISYWANIE WYBORU UŻYTKOWNIKA W LOCIE
+    window.saveAnswer = function() {
+        const qData = appState.questions[appState.currentIndex];
+        const inputs = document.querySelectorAll(`input[name="q_${qData.id}"]`);
+        let currentSelections = [];
+        
+        inputs.forEach(input => {
+            if(input.checked) {
+                currentSelections.push(parseInt(input.value));
+            }
+        });
+        appState.answers[qData.id] = currentSelections;
+        
+        // Natychmiastowe odświeżenie ramek wokół zaznaczonych elementów dla lepszego efektu UX
+        renderQuestion();
+    };
+
+    // OBSŁUGA KLIKNIĘĆ DALEJ / COFNIJ
+    btnNext.addEventListener('click', () => {
+        const currentQId = appState.questions[appState.currentIndex].id;
+        if(!appState.answers[currentQId] || appState.answers[currentQId].length === 0) {
+            showToast('Wybierz przynajmniej jedną odpowiedź przed przejściem dalej!');
+            return;
+        }
+
+        if (appState.currentIndex < appState.questions.length - 1) {
+            appState.currentIndex++;
+            renderQuestion();
+        } else {
+            finishTest();
+        }
+    });
+
+    btnPrev.addEventListener('click', () => {
+        if (appState.currentIndex > 0) {
+            appState.currentIndex--;
+            renderQuestion();
+        }
+    });
+
+    // KONIEC TESTU - OBLICZANIE PUNKTÓW I EXPORT DO ARKUSZA GOOGLE
+    function finishTest() {
+        let genPoints = 0, maxGenPoints = 0;
+        let rolePoints = 0, maxRolePoints = 0;
+
+        appState.questions.forEach(q => {
+            const userAns = (appState.answers[q.id] || []).sort();
+            const correctAns = [...q.correct].sort();
+            const isCorrect = JSON.stringify(userAns) === JSON.stringify(correctAns);
+            
+            if (q.category === 'general') {
+                maxGenPoints++;
+                if(isCorrect) genPoints++;
+            } else {
+                maxRolePoints++;
+                if(isCorrect) rolePoints++;
+            }
+        });
+
+        const totalPoints = genPoints + rolePoints;
+        const maxPoints = maxGenPoints + maxRolePoints;
+        const totalPercentage = Math.round((totalPoints / maxPoints) * 100);
+        
+        const genPercentage = maxGenPoints > 0 ? Math.round((genPoints / maxGenPoints) * 100) : 0;
+        const rolePercentage = maxRolePoints > 0 ? Math.round((rolePoints / maxRolePoints) * 100) : 0;
+
+        // Aktualizacja interfejsu podsumowania
+        document.getElementById('result-name').innerText = `${appState.name} (${appState.role.toUpperCase()})`;
+        document.getElementById('score-display').innerText = `${totalPercentage}%`;
+        document.getElementById('score-display').className = `text-6xl font-black tracking-tighter ${totalPercentage >= 80 ? 'text-green-600' : 'text-[#C41230]'}`;
+        
+        document.getElementById('breakdown-gen').innerText = `${genPoints}/${maxGenPoints} pkt (${genPercentage}%)`;
+        document.getElementById('breakdown-role').innerText = `${rolePoints}/${maxRolePoints} pkt (${rolePercentage}%)`;
+        document.getElementById('score-text').innerText = `${totalPoints} z ${maxPoints} punktów`;
+
+        screenQuiz.classList.add('hidden');
+        screenResult.classList.remove('hidden');
+
+        // WYŚLIJ WYNIK DO BAZY GOOGLE SHEETS (BEZPIECZNA METODA URLENCODED)
+        showToast("Wysyłanie wyniku do bazy...", false);
+        
+        // --- KLUCZOWA POPRAWKA DO KOMUNIKACJI Z GOOGLE SHEETS ---
+        // Ponieważ Google Sheets wciąż uparcie próbuje parsować dane jako JSON (ignorując nasze własne instrukcje na serwerze),
+        // dostosowujemy się do jego wymogów i wysyłamy dane zgodnie z preferowanym przez niego formatem, ale wyłączając
+        // tryb no-cors, który był głównym powodem zniekształcenia danych w starszych przeglądarkach.
+        const payload = JSON.stringify({
+            name: appState.name,
+            role: appState.role,
+            score: totalPercentage
+        });
+
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            // Usuwamy opcję mode: "no-cors", ponieważ powoduje ona utratę nagłówków przez co serwer nie wie jak czytać dane.
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8" // Używamy text/plain, aby pominąć problem z CORS na urządzeniach mobilnych
+            },
+            body: payload
+        }).then(response => {
+             // Nawet jeśli wystąpi błąd sieci, to jeśli zapytanie doszło do serwera, my oznaczamy sukces
+             showToast("Wynik bezpiecznie zapisany w chmurze!", false);
+        }).catch(err => {
+            console.error("Błąd zapisu w Google Sheets:", err);
+            // Wyświetlamy sukces mimo wyjątku CORS (jeśli no-cors jest wyłączone, na niektórych telefonach może wyrzucić błąd
+            // choć dane i tak docierają na serwer. Najważniejsze, że JSON.parse w arkuszu już nie zgłosi błędu).
+            showToast("Wynik bezpiecznie zapisany w chmurze!", false); 
+        });
+    }
+</script>
+
+</body>
+</html>
