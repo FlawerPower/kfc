@@ -4,448 +4,579 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KFC - Test ze Standardów</title>
-    <!-- Dołączenie nowoczesnego frameworka Tailwind CSS -->
+    <!-- Tailwind CSS do szybkiego pozycjonowania i responsywności -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Import eleganckiej czcionki Google Font (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F4F3F0; /* Markowy kremowy odcień tła KFC */
+        :root {
+            --bg-color: #050706; /* Głęboka nocna czerń */
+            --surface-color: rgba(14, 11, 20, 0.94); /* Bardzo ciemny grafit z nutą fioletu */
+            --border-neon: #a855f7; /* Jasny fioletowy neon */
+            --text-color: #f3f4f6;
+            --border-radius: 16px;
         }
-        /* Płynne animacje dla elementów UI */
-        .transition-all-300 {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        body {
+            /* Przyciemniamy tło las.jpg bezpośrednio w gradiencie, co daje genialny efekt nocy i doskonałą czytelność */
+            background-image: linear-gradient(rgba(5, 7, 6, 0.85), rgba(5, 7, 6, 0.91)), url('las.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* WŁAŚCIWY KONTENER TESTU */
+        .glass-panel {
+            background-color: var(--surface-color);
+            border: 2px solid var(--border-neon);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* KULOODPORNY NEON (Oddzielna warstwa emitująca potężne światło pod kontenerem, niezależna od renderowania filtrów szkła) */
+        .neon-glow-behind {
+            position: absolute;
+            inset: -2px; /* Lekko wystaje poza krawędzie obwódki */
+            background: linear-gradient(45deg, #a855f7, #7c3aed, #d8b4fe);
+            border-radius: var(--border-radius);
+            z-index: 1; /* Pod glass-panel */
+            filter: blur(15px);
+            animation: intenseGlow 3s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes intenseGlow {
+            0% { 
+                opacity: 0.6; 
+                filter: blur(12px); 
+                transform: scale(1); 
+            }
+            100% { 
+                opacity: 1; 
+                filter: blur(20px); 
+                transform: scale(1.015); 
+            }
+        }
+
+        /* Subtelny glow na tekście (poprawiona czytelność) */
+        .neon-text-main {
+            color: #ffffff;
+            text-shadow: 0 0 4px rgba(168, 85, 247, 0.5); 
+        }
+
+        .neon-text-sub {
+            color: #e9d5ff;
+            text-shadow: 0 0 2px rgba(168, 85, 247, 0.3);
+        }
+
+        /* Przyciski */
+        .neon-btn-primary {
+            background: linear-gradient(135deg, #7c3aed, #581c87);
+            border: 1px solid #c084fc;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .neon-btn-primary:hover {
+            background: linear-gradient(135deg, #8b5cf6, #6b21a8);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        .neon-btn-primary:active { transform: translateY(1px); }
+
+        /* Opcje odpowiedzi */
+        .option-card {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            background-color: rgba(20, 15, 30, 0.6);
+        }
+        .option-card:hover {
+            border-color: rgba(168, 85, 247, 0.5);
+            background-color: rgba(124, 58, 237, 0.1);
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.15);
+        }
+        .option-card.selected {
+            border-color: #c084fc;
+            background-color: rgba(139, 92, 246, 0.18);
+            box-shadow: 0 0 18px rgba(168, 85, 247, 0.45), inset 0 0 8px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #09070f; }
+        ::-webkit-scrollbar-thumb { background: #581c87; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 sm:p-6 select-none">
+<body class="p-4 md:p-8">
 
-<div class="w-full max-w-xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden relative transition-all-300">
+<!-- SYSTEM TOASTÓW -->
+<div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+<!-- WRAPPER KONTENERA (Pozwala na rozdzielenie poświaty i szkła) -->
+<div class="relative w-full max-w-xl my-6 fade-in">
     
-    <!-- BRANDING: Legendarny motyw trzech czerwonych pasów KFC na samej górze karty -->
-    <div class="h-4 w-full flex">
-        <div class="flex-1 bg-[#C41230]"></div>
-        <div class="flex-1 bg-white"></div>
-        <div class="flex-1 bg-[#C41230]"></div>
-        <div class="flex-1 bg-white"></div>
-        <div class="flex-1 bg-[#C41230]"></div>
-    </div>
+    <!-- POTĘŻNY NEONOWY GLOW (Znajduje się pod spodem panela, dając 100% gwarancji świecenia) -->
+    <div class="neon-glow-behind"></div>
 
-    <div class="p-6 sm:p-8">
+    <!-- GŁÓWNY KONTENER TESTU -->
+    <div class="glass-panel w-full p-6 md:p-8">
         
-        <!-- EKRAN 1: MENU STARTOWE I DYNAMICZNY RANKING TOP 5 -->
-        <div id="screen-start" class="space-y-6">
-            <div class="text-center space-y-2">
-                <!-- Ikona kubełka/kurczaka KFC zrobiona w wektorze SVG -->
-                <div class="inline-flex justify-center items-center w-16 h-16 bg-red-50 rounded-full mb-2">
-                    <svg class="w-10 h-10 text-[#C41230]" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+        <!-- EKRAN 1: START -->
+        <div id="screen-start">
+            <div class="text-center mb-6">
+                <!-- Klimatyczne minimalistyczne logo z silną neonową poświatą -->
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-950/40 border border-purple-500/70 mb-4 shadow-[0_0_20px_rgba(168,85,247,0.4)] relative z-20">
+                    <svg class="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
-                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Test ze Standardów KFC</h1>
-                <p class="text-sm text-gray-500 max-w-sm mx-auto">Wpisz swoje dane, aby rozpocząć oficjalny test wiedzy stanowiskowej.</p>
+                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight neon-text-main relative z-20">Test ze Standardów KFC</h1>
+                <p class="text-purple-200/70 text-sm mt-1.5 relative z-20">Wpisz swoje dane, aby uruchomić weryfikację wiedzy</p>
             </div>
-
-            <!-- Formularz startowy danych pracownika -->
-            <div class="space-y-4">
-                <div class="space-y-1">
-                    <label class="text-xs font-bold text-gray-700 uppercase tracking-wider block" for="userName">Imię i Nazwisko:</label>
-                    <input type="text" id="userName" placeholder="np. Jan Kowalski" 
-                           class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C41230] focus:border-transparent transition-all-300">
+            
+            <div class="space-y-4 mb-6 relative z-20">
+                <div>
+                    <label class="block text-sm font-semibold text-purple-200 mb-1" for="userName">Imię i pierwsza litera nazwiska:</label>
+                    <input type="text" id="userName" class="w-full bg-zinc-950/80 border border-purple-900/60 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 focus:shadow-[0_0_10px_rgba(168,85,247,0.2)] transition-all" placeholder="np. Jan K." required>
                 </div>
-
-                <div class="space-y-1">
-                    <label class="text-xs font-bold text-gray-700 uppercase tracking-wider block" for="userRole">Wybierz swoje stanowisko:</label>
-                    <select id="userRole" 
-                            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#C41230] focus:border-transparent transition-all-300">
+                
+                <div>
+                    <label class="block text-sm font-semibold text-purple-200 mb-1" for="userRole">Wybierz swoje stanowisko:</label>
+                    <select id="userRole" class="w-full bg-zinc-950/80 border border-purple-900/60 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all">
                         <option value="" disabled selected>-- Wybierz z listy --</option>
-                        <option value="kuchnia">Kuchnia (Kucharz / Panierowanie)</option>
-                        <option value="front">Front (Obsługa, Kasa i Lobby)</option>
-                        <option value="serwis">Serwis (Pakowanie / Wydawanie)</option>
+                        <option value="kuchnia">Kuchnia</option>
+                        <option value="front">Front</option>
+                        <option value="serwis">Serwis</option>
                     </select>
                 </div>
-
-                <button id="btn-start" class="w-full py-4 bg-[#C41230] hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-200 hover:shadow-none transform hover:-translate-y-0.5 active:translate-y-0 transition-all-300">
-                    Rozpocznij Test
-                </button>
             </div>
-
-            <!-- DYNAMICZNY RANKING TOP 5 -->
-            <div id="leaderboard-box" class="pt-4 border-t border-gray-100 hidden">
-                <h3 class="text-xs font-extrabold text-[#C41230] uppercase tracking-widest text-center mb-3">🏆 RESTAURACYJNY RANKING TOP 5</h3>
-                <div id="leaderboard-entries" class="bg-gray-50 rounded-xl border border-gray-100 divide-y divide-gray-100 overflow-hidden">
-                    <p class="text-center py-4 text-xs font-semibold text-gray-400 animate-pulse">Pobieranie aktualnych wyników...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- EKRAN 2: INTEGRACJA SYSTEMU QUIZU -->
-        <div id="screen-quiz" class="hidden space-y-6">
-            <!-- Pasek postępu na samej górze pytań -->
-            <div class="space-y-2">
-                <div class="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                    <div id="progress" class="h-full bg-[#C41230] rounded-full transition-all-300" style="width: 0%"></div>
-                </div>
-                <div class="flex justify-between items-center text-xs font-bold text-gray-400">
-                    <span id="question-category" class="uppercase tracking-wider text-[#C41230]">Wiedza ogólna</span>
-                    <span id="question-counter">Pytanie 1 z 4</span>
-                </div>
-            </div>
-
-            <!-- Kontener, w którym JS dynamicznie renderuje pytania -->
-            <div id="question-container" class="min-h-[220px]">
-                <!-- Pytanie i opcje renderowane dynamicznie -->
-            </div>
-
-            <!-- Przyciski nawigacyjne po teście -->
-            <div class="flex gap-3 pt-2">
-                <button id="btn-prev" class="flex-1 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-all-300 hidden">
-                    Wstecz
-                </button>
-                <button id="btn-next" class="flex-1 py-3.5 bg-[#C41230] hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-100 transition-all-300">
-                    Dalej
-                </button>
-            </div>
-        </div>
-
-        <!-- EKRAN 3: PODSUMOWANIE WYNIKÓW -->
-        <div id="screen-result" class="hidden text-center space-y-6">
-            <div class="space-y-2">
-                <div class="inline-flex justify-center items-center w-20 h-20 bg-green-50 text-green-500 rounded-full mb-2">
-                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                    </svg>
-                </div>
-                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Koniec Testu!</h1>
-                <p id="result-name" class="text-sm font-bold text-gray-500 uppercase tracking-wider"></p>
-            </div>
-
-            <!-- Główne wyświetlenie procentowego wyniku -->
-            <div id="score-display" class="text-6xl font-black text-red-500 tracking-tighter">0%</div>
-
-            <!-- Kafelkowy podział na sekcje punktowe (Ogólna i Stanowiskowa) -->
-            <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 text-left divide-y divide-gray-200/50 space-y-3">
-                <div class="flex justify-between items-center pb-2.5">
-                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Wiedza ogólna (Standardy):</span>
-                    <strong id="breakdown-gen" class="text-sm text-gray-900 font-bold">-</strong>
-                </div>
-                <div class="flex justify-between items-center pt-2.5 pb-2.5">
-                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Wiedza stanowiskowa:</span>
-                    <strong id="breakdown-role" class="text-sm text-gray-900 font-bold">-</strong>
-                </div>
-                <div class="flex justify-between items-center pt-2.5 font-bold text-gray-900 text-base">
-                    <span class="uppercase tracking-wider text-xs font-extrabold text-[#C41230]">Łączny wynik:</span>
-                    <span id="score-text" class="text-lg font-extrabold text-gray-900">-</span>
-                </div>
-            </div>
-
-            <p class="text-sm text-green-600 font-bold flex justify-center items-center gap-1.5 bg-green-50 py-3 rounded-xl border border-green-100">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l5-5z" clip-rule="evenodd"/>
-                </svg>
-                Twój wynik został automatycznie zapisany!
-            </p>
-
-            <button onclick="location.reload()" class="w-full py-4 bg-gray-900 hover:bg-black text-white font-bold rounded-xl transition-all-300">
-                Powrót do menu głównego
+            
+            <button id="btn-start" class="w-full py-4 neon-btn-primary text-white font-extrabold rounded-xl transform active:scale-[0.99] relative z-20">
+                Rozpocznij Test
             </button>
+
+            <!-- SEKCJA RANKINGU TOP 5 -->
+            <div class="mt-8 pt-6 border-t border-purple-950/60 relative z-20">
+                <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2 justify-center">
+                    <span class="text-purple-400">🏆</span> <span class="neon-text-sub">Ranking TOP 5 Pracowników</span>
+                </h2>
+                <div id="leaderboard-loading" class="text-center py-4 text-purple-300/50 text-sm">Wczytywanie tabeli liderów...</div>
+                <div id="leaderboard-empty" class="text-center py-4 text-purple-300/50 text-sm hidden">Brak zapisanych wyników. Bądź pierwszy!</div>
+                <div id="leaderboard-list" class="space-y-2.5 hidden">
+                    <!-- Generowane dynamicznie -->
+                </div>
+            </div>
         </div>
 
+        <!-- EKRAN 2: QUIZ -->
+        <div id="screen-quiz" class="hidden relative z-20">
+            <!-- Pasek postępu -->
+            <div class="w-full h-1.5 bg-zinc-950 rounded-full mb-5 overflow-hidden">
+                <div id="progress" class="h-full bg-gradient-to-r from-purple-600 to-fuchsia-500 w-0 transition-all duration-300 shadow-[0_0_8px_#a855f7]"></div>
+            </div>
+            <div class="flex justify-between items-center mb-6">
+                <span id="question-category" class="px-2.5 py-1 bg-purple-950/60 border border-purple-600/40 text-purple-200 text-xs font-semibold rounded-full uppercase tracking-wider shadow-[0_0_6px_rgba(124,58,237,0.15)]">Część ogólna</span>
+                <span id="question-counter" class="text-xs text-purple-300/70">Pytanie 1 z 10</span>
+            </div>
+            
+            <div id="question-container" class="fade-in">
+                <!-- Pytanie i opcje renderowane przez silnik JS -->
+            </div>
+
+            <div class="flex gap-4 mt-8">
+                <button id="btn-prev" class="w-1/3 py-3.5 bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 font-bold rounded-xl border border-zinc-800 transition-all active:scale-[0.98] hidden">Wstecz</button>
+                <button id="btn-next" class="flex-1 py-3.5 neon-btn-primary text-white font-extrabold rounded-xl transition-all active:scale-[0.98]">Dalej</button>
+            </div>
+        </div>
+
+        <!-- EKRAN 3: WYNIK -->
+        <div id="screen-result" class="hidden relative z-20">
+            <div class="text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-950/40 border border-purple-500/40 mb-4 shadow-[0_0_15px_rgba(139,92,246,0.25)]">
+                    <span class="text-2xl">🎉</span>
+                </div>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-white neon-text-main">Test Ukończony!</h1>
+                <p id="result-name" class="text-purple-300 font-semibold text-lg mt-1.5"></p>
+                
+                <!-- Wyniki procentowe i punktowe z rozbiciem na kategorie -->
+                <div class="my-6 p-5 bg-zinc-950/70 border border-purple-950/80 rounded-2xl space-y-4 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                    <div class="flex justify-between items-center pb-3 border-b border-purple-950/40">
+                        <span class="text-purple-200/80 font-medium text-sm">Wiedza ogólna:</span>
+                        <span id="result-general" class="text-white font-bold">0/0 (0%)</span>
+                    </div>
+                    <div class="flex justify-between items-center pb-3 border-b border-purple-950/40">
+                        <span class="text-purple-200/80 font-medium text-sm">Wiedza stanowiskowa:</span>
+                        <span id="result-role" class="text-white font-bold">0/0 (0%)</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-1">
+                        <span class="text-purple-200 font-bold text-base">ŁĄCZNY WYNIK:</span>
+                        <span id="result-total" class="text-2xl font-black text-purple-400 text-shadow-[0_0_10px_rgba(168,85,247,0.4)]">0%</span>
+                    </div>
+                </div>
+
+                <p class="text-purple-300/60 text-sm px-4 mb-6">Twoje punkty zostały automatycznie wysłane do bazy danych Managera.</p>
+                
+                <button onclick="location.reload()" class="w-full py-4 bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-white font-bold rounded-xl transition-all">
+                    Rozpocznij Nowy Test
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- DYNAMICZNE POWIADOMIENIE TOAST (NOWOCZESNE I SZYBKIE) -->
-<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-24 bg-[#C41230] text-white px-6 py-3.5 rounded-xl shadow-2xl font-bold text-sm transition-all-300 opacity-0 pointer-events-none z-50 flex items-center gap-2"></div>
-
 <script>
-    // TWOJA ZWERYFIKOWANA BAZA DANYCH W CHMURZE GOOGLE SHEETS
+    // TWOJA BAZA DANYCH GOOGLE SHEETS
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxk3On3PlbyAd7Qz9kW6Wt6xrxxBaomQkkuVzm_bWzWSN1wOw8K6qX0iU-CnGsj0HGe/exec";
 
-    // System powiadomień bez używania przestarzałych "alert()"
-    function showToast(message, isError = true) {
-        const toast = document.getElementById('toast');
-        toast.innerText = message;
-        
-        if (isError) {
-            toast.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#C41230] text-white px-6 py-3.5 rounded-xl shadow-2xl font-bold text-sm transition-all-300 z-50 flex items-center gap-2 translate-y-0 opacity-100";
-        } else {
-            toast.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3.5 rounded-xl shadow-2xl font-bold text-sm transition-all-300 z-50 flex items-center gap-2 translate-y-0 opacity-100";
-        }
-        
-        setTimeout(() => {
-            toast.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#C41230] text-white px-6 py-3.5 rounded-xl shadow-2xl font-bold text-sm transition-all-300 z-50 flex items-center gap-2 translate-y-24 opacity-0 pointer-events-none";
-        }, 3500);
-    }
-
-    // BAZA PYTAŃ - ZORGANIZOWANA ARCHITEKTONICZNIE WEDŁUG WYMOGÓW KFC
+    // BAZA PYTAŃ OPERACYJNYCH
     const questionBank = {
         general: [
-            { id: 'g1', type: 'single', q: 'Jak długo trwa proceduralne mycie rąk?', options: ['5 sekund', '20 sekund', '60 sekund'], correct: [1] },
-            { id: 'g2', type: 'single', q: 'Co oznacza zasada FIFO?', options: ['First In First Out', 'Fast In Fast Out', 'First In First Off'], correct: [0] },
-            { id: 'g3', type: 'multi', q: 'Wybierz filary standardu CHAMPS (zaznacz 2 prawidłowe):', options: ['Cleanliness (Czystość)', 'Marketing (Reklama)', 'Speed (Szybkość)', 'Safety (Ochrona)'], correct: [0, 2] }
+            { id: 'g1', type: 'single', q: 'Jak długo trwa proceduralne mycie rąk w KFC?', options: ['5 sekund', '20 sekund (samo wcieranie mydła)', '60 sekund', 'Zależy od stanowiska'], correct: [1] },
+            { id: 'g2', type: 'single', q: 'Zgodnie z zasadą FIFO, które produkty należy zużyć w pierwszej kolejności?', options: ['Te o najwyższej wartości Food Cost', 'Te stojące najbliżej krawędzi półki', 'Te z najkrótszym terminem przydatności lub przyjęte najwcześniej'], correct: [2] },
+            { id: 'g3', type: 'multi', q: 'Wybierz filary standardu gościnności i operacji CHAMPS (zaznacz 2 prawidłowe):', options: ['Cleanliness (Czystość)', 'Marketing (Reklama)', 'Speed (Szybkość)', 'Safety (Ochrona BHP)'], correct: [0, 2] }
         ],
         roles: {
             kuchnia: [
-                { id: 'k1', type: 'single', q: 'Co oznacza liczba 10 w procedurze panierowania 7-10-7?', options: ['Smażenie przez 10 minut', '10 ruchów w basenie z wodą', '10 przypraw w mące'], correct: [1] },
-                { id: 'k2', type: 'single', q: 'Jaka jest prawidłowa temperatura wewnątrz usmażonego kurczaka?', options: ['Minimum 65°C', 'Minimum 82°C', 'Dokładnie 100°C'], correct: [1] },
-                { id: 'k3', type: 'multi', q: 'Które produkty są przygotowywane we frytownicach ciśnieniowych? (zaznacz wszystkie)', options: ['Frytki', 'Kawałki Original Recipe (z kością)', 'Strips'], correct: [1] }
+                { id: 'k1', type: 'single', q: 'Co oznacza liczba 10 w legendarnej procedurze panierowania 7-10-7?', options: ['Smażenie przez 10 minut', '10-krotne zanurzenie/wstrząśnięcie w wodzie', '10 ruchów dłonią przy mieszaniu mąki'], correct: [1] },
+                { id: 'k2', type: 'single', q: 'Jaka jest prawidłowa wewnętrzna temperatura usmażonego kurczaka?', options: ['Minimum 65°C', 'Minimum 82°C (krytyczny punkt CCP)', 'Dokładnie 100°C'], correct: [1] },
+                { id: 'k3', type: 'multi', q: 'Które produkty są przygotowywane w kuchni we frytownicach ciśnieniowych? (zaznacz wszystkie)', options: ['Kawałki kurczaka Original Recipe z kością', 'Frytki koszykowe', 'Strips (pikantne polędwiczki)'], correct: [0] }
             ],
             front: [
-                { id: 'f1', type: 'single', q: 'Czy na jednej kasie (szufladzie) może pracować dwóch kasjerów?', options: ['Tak, w czasie dużego ruchu dla przyspieszenia obsługi', 'Nie, jest to kategorycznie zabronione'], correct: [1] },
-                { id: 'f2', type: 'multi', q: 'Co składa się na standard up-sellingu (sugerowania)? (zaznacz poprawne)', options: ['Proponowanie powiększenia zestawu lub napoju', 'Zmuszanie klienta do zakupu deseru', 'Sugerowanie dodatku do zamówienia'], correct: [0, 2] },
-                { id: 'f3', type: 'single', q: 'Jaka jest prawidłowa procedura w przypadku rozlania płynu na lobby?', options: ['Natychmiastowe zabezpieczenie żółtym potykaczem i wytarcie mopem', 'Poczekanie na koniec fali ruchu', 'Zasypanie plamy mąką'], correct: [0] }
+                { id: 'f1', type: 'single', q: 'Jak reagujemy na zgłoszenie zimnych frytek lub pomyłki w zamówieniu na lobby?', options: ['Natychmiast przepraszamy i wymieniamy produkt na świeży', 'Prosimy o dowód zakupu i wypełnienie reklamacji', 'Tłumaczymy, że frytki przed chwilą wyszły z frytownicy'], correct: [0] },
+                { id: 'f2', type: 'single', q: 'Czy na jednej kasetce kasowej w tym samym czasie może pracować dwóch kasjerów?', options: ['Tak, podczas piku sprzedażowego', 'Nie, jest to kategorycznie zabronione standardem gotówkowym'], correct: [1] },
+                { id: 'f3', type: 'multi', q: 'Co wchodzi w skład poprawnego standardu sugerowania (up-sellingu)? (zaznacz 2 odpowiedzi)', options: ['Sugerowanie powiększenia zestawu lub dołożenia sosu', 'Przymuszenie gościa do zamówienia deseru na koniec', 'Zaproponowanie dodatku komplementarnego do kupowanego dania'], correct: [0, 2] }
             ],
             serwis: [
-                { id: 's1', type: 'single', q: 'Jak reagujemy na zgłoszenie zimnych frytek?', options: ['Natychmiast wymieniamy na nowe', 'Prosimy o paragon i wypełnienie formularza', 'Odmawiamy, jeśli klient zjadł połowę'], correct: [0] },
-                { id: 's2', type: 'single', q: 'Co jest kluczowe podczas kompletowania zamówień na wynos (Take-away)?', options: ['Szczelne zamknięcie torby w celu utrzymania temperatury', 'Szybkie wrzucenie produktów bez sprawdzania z paragonem', 'Wydanie zamówienia bez serwetek'], correct: [0] },
-                { id: 's3', type: 'single', q: 'Jaki jest standard pakowania serwetek papierowych do zamówienia?', options: ['Jedna serwetka na każdy zamówiony produkt z kurczakiem', 'Zawsze cała garść serwetek', 'Pakujemy tylko na wyraźne życzenie klienta'], correct: [0] }
+                { id: 's1', type: 'single', q: 'Co robimy z produktem na zsuwni (chute), który przekroczył dozwolony czas przetrzymywania (Hold Time)?', options: ['Natychmiast spisujemy na straty (Waste) i wyrzucamy', 'Przesmażamy ponownie, by odzyskał chrupkość', 'Mieszamy ze świeżo wysmażoną partią z chłodni'], correct: [0] },
+                { id: 's2', type: 'single', q: 'Jaka jest podstawowa funkcja zsuwni (chute) w strefie pakowania?', options: ['Służy do przechowywania zapasów napojów', 'Utrzymuje odpowiednią temperaturę i rotację gotowych produktów przed wydaniem', 'Jest miejscem odkładania brudnych tacek'], correct: [1] },
+                { id: 's3', type: 'multi', q: 'Jakie elementy muszą obowiązkowo znaleźć się w torbie z zamówieniem na wynos? (zaznacz wszystkie)', options: ['Zamówione produkty i odpowiednia liczba serwetek', 'Paragon/rachunek fiskalny', 'Karta lojalnościowa innego klienta'], correct: [0, 1] }
             ]
         }
     };
 
-    // Konfiguracja podziału ilości pytań (2 ogólne i 2 stanowiskowe)
-    const CONFIG = { generalQuestionsCount: 2, roleQuestionsCount: 2 };
-    
-    // Stan maszyny stanowej naszej aplikacji
-    let appState = { name: '', role: '', questions: [], currentIndex: 0, answers: {} };
+    // PARAMETRY GENEROWANIA TESTU
+    const CONFIG = {
+        generalCount: 2, // Ile pytań ogólnych wylosować
+        roleCount: 2    // Ile pytań stanowiskowych wylosować
+    };
 
-    // ŁADOWANIE RANKINGU TOP 5 Z BAZY DANYCH GOOGLE SHEETS
+    // Słownik do wyświetlania ról z Wielkiej Litery
+    const roleDisplayNames = {
+        kuchnia: "Kuchnia",
+        front: "Front",
+        serwis: "Serwis"
+    };
+
+    // STAN SYSTEMU
+    let appState = {
+        name: '',
+        role: '',
+        questions: [], // połączona lista pytań
+        currentIndex: 0,
+        answers: {}
+    };
+
+    // INICJALIZACJA SYSTEMU PO ZAŁADOWANIU DOM
+    window.onload = function() {
+        loadLeaderboard();
+    };
+
+    // FUNKCJA: Pobieranie rankingu TOP 5 z arkusza
     function loadLeaderboard() {
-        const box = document.getElementById('leaderboard-box');
-        box.classList.remove('hidden');
-        
+        const loadingEl = document.getElementById('leaderboard-loading');
+        const emptyEl = document.getElementById('leaderboard-empty');
+        const listEl = document.getElementById('leaderboard-list');
+
         fetch(WEB_APP_URL)
             .then(res => res.json())
             .then(data => {
-                const container = document.getElementById('leaderboard-entries');
-                container.innerHTML = '';
+                loadingEl.classList.add('hidden');
                 
-                if (data && data.length > 0) {
-                    // Ograniczamy dane do TOP 5 najlepszych wyników
-                    const top5 = data.slice(0, 5);
-                    
-                    top5.forEach((row, idx) => {
-                        let badge = `${idx + 1}.`;
-                        if (idx === 0) badge = '<span class="text-xl">🥇</span>';
-                        if (idx === 1) badge = '<span class="text-xl">🥈</span>';
-                        if (idx === 2) badge = '<span class="text-xl">🥉</span>';
-                        
-                        const el = document.createElement('div');
-                        el.className = "flex items-center justify-between p-3.5 transition-all-300 hover:bg-gray-100/50";
-                        el.innerHTML = `
+                if(!data || data.length === 0) {
+                    emptyEl.classList.remove('hidden');
+                    return;
+                }
+
+                // Bezpieczne przycinanie tylko do TOP 5 wyników na froncie
+                const top5 = data.slice(0, 5);
+
+                let html = '';
+                top5.forEach((user, index) => {
+                    let medal = '👤';
+                    if(index === 0) medal = '🥇';
+                    else if(index === 1) medal = '🥈';
+                    else if(index === 2) medal = '🥉';
+
+                    const roleText = roleDisplayNames[user.role] || user.role;
+
+                    html += `
+                        <div class="flex items-center justify-between p-3 bg-zinc-950/60 border border-purple-950/80 rounded-xl shadow-[inset_0_0_8px_rgba(139,92,246,0.05)]">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 flex justify-center font-black text-gray-400">${badge}</div>
-                                <div class="flex flex-col">
-                                    <span class="font-bold text-gray-800 text-sm leading-tight">${row.name}</span>
-                                    <span class="text-[10px] font-extrabold text-[#C41230] uppercase tracking-wider">${row.role}</span>
+                                <span class="text-xl">${medal}</span>
+                                <div>
+                                    <p class="font-bold text-white text-sm">${escapeHtml(user.name)}</p>
+                                    <p class="text-xs text-purple-300/65">${escapeHtml(roleText)}</p>
                                 </div>
                             </div>
-                            <div class="font-black text-green-600 text-base">${row.score}%</div>
-                        `;
-                        container.appendChild(el);
-                    });
-                } else {
-                    container.innerHTML = '<p class="text-center py-6 text-xs font-semibold text-gray-400">Brak wyników w bazie. Bądź pierwszy!</p>';
-                }
+                            <span class="font-black text-purple-400 text-sm text-shadow-[0_0_5px_rgba(168,85,247,0.3)]">${parseInt(user.score)}%</span>
+                        </div>
+                    `;
+                });
+
+                listEl.innerHTML = html;
+                listEl.classList.remove('hidden');
             })
             .catch(err => {
-                console.error("Błąd pobierania rankingu:", err);
-                document.getElementById('leaderboard-entries').innerHTML = '<p class="text-center py-6 text-xs font-bold text-red-500">Problem z połączeniem sieciowym bazy.</p>';
+                loadingEl.innerText = "Nie udało się wczytać rankingu.";
+                console.error("Błąd ładowania rankingu:", err);
             });
     }
 
-    // Wywołanie pobierania rankingu na start strony
-    loadLeaderboard();
+    // SYSTEM POWIADOMIEŃ TOAST
+    function showToast(message, isError = false) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `p-4 rounded-xl text-sm font-semibold text-white shadow-[0_0_15px_rgba(0,0,0,0.5)] flex items-center gap-2 transform translate-y-2 opacity-0 transition-all duration-300 pointer-events-auto ${
+            isError ? 'bg-red-950/90 border border-red-500/70 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'bg-purple-950/90 border border-purple-500/70 shadow-[0_0_15px_rgba(168,85,247,0.25)]'
+        }`;
+        toast.innerHTML = `
+            <span>${isError ? '⚠️' : '🔮'}</span>
+            <span>${message}</span>
+        `;
+        container.appendChild(toast);
 
-    // Funkcja pomocnicza: pobieranie losowej puli z banku pytań
-    function getRandomQuestions(arr, count) {
-        return [...arr].sort(() => 0.5 - Math.random()).slice(0, count);
+        // Wyzwalanie animacji wejścia
+        setTimeout(() => {
+            toast.classList.remove('translate-y-2', 'opacity-0');
+        }, 10);
+
+        // Usuwanie toastu po 3.5 sekundy
+        setTimeout(() => {
+            toast.classList.add('opacity-0', 'translate-y-[-8px]');
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
     }
 
-    // Pobieranie referencji do kontenerów HTML
-    const screenStart = document.getElementById('screen-start');
-    const screenQuiz = document.getElementById('screen-quiz');
-    const screenResult = document.getElementById('screen-result');
-    const questionContainer = document.getElementById('question-container');
-    const btnNext = document.getElementById('btn-next');
-    const btnPrev = document.getElementById('btn-prev');
+    // POMOCNIK: Mieszanie i wybieranie pytań
+    function selectRandom(arr, count) {
+        const shuffled = [...arr].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
+    }
 
-    // URUCHOMIENIE TESTU (KLIKNIĘCIE START)
+    // OBSŁUGA ROZPOCZĘCIA TESTU
     document.getElementById('btn-start').addEventListener('click', () => {
         const nameInput = document.getElementById('userName').value.trim();
         const roleInput = document.getElementById('userRole').value;
 
-        if(!nameInput || !roleInput) {
-            showToast('Musisz podać swoje imię oraz wybrać stanowisko!');
+        // Walidacja zapisu: "Imię N." lub "Imię N" (Litery polskie, spacja, jedna litera, opcjonalna kropka)
+        const nameRegex = /^[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż\-']+\s[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]\.?$/;
+
+        if(!nameInput) {
+            showToast('Proszę podać swoje imię i inicjał nazwiska!', true);
+            return;
+        }
+
+        if(!nameRegex.test(nameInput)) {
+            showToast('Wpisz imię i tylko pierwszą literę nazwiska (np. Jan K.)!', true);
+            return;
+        }
+
+        if(!roleInput) {
+            showToast('Proszę wybrać stanowisko!', true);
             return;
         }
 
         appState.name = nameInput;
         appState.role = roleInput;
 
-        // Wybór losowych pytań dla obu sekcji
-        const selectedGeneral = getRandomQuestions(questionBank.general, CONFIG.generalQuestionsCount)
-                                .map(q => ({ ...q, category: 'general' }));
-        const selectedRole = getRandomQuestions(questionBank.roles[roleInput], CONFIG.roleQuestionsCount)
-                             .map(q => ({ ...q, category: 'role' }));
-        
-        appState.questions = [...selectedGeneral, ...selectedRole];
+        // Dobieranie pytań
+        const generalSelected = selectRandom(questionBank.general, CONFIG.generalCount).map(q => ({...q, category: 'general'}));
+        const roleSelected = selectRandom(questionBank.roles[roleInput], CONFIG.roleCount).map(q => ({...q, category: 'role'}));
+
+        appState.questions = [...generalSelected, ...roleSelected];
         appState.currentIndex = 0;
         appState.answers = {};
 
-        screenStart.classList.add('hidden');
-        screenQuiz.classList.remove('hidden');
+        // Przełączenie ekranów
+        document.getElementById('screen-start').classList.add('hidden');
+        document.getElementById('screen-quiz').classList.remove('hidden');
+
         renderQuestion();
     });
 
-    // RENDEROWANIE PYTANIA W KONTENERZE HTML
+    // ELEMENTY INTERFEJSU QUIZU
+    const questionContainer = document.getElementById('question-container');
+    const btnNext = document.getElementById('btn-next');
+    const btnPrev = document.getElementById('btn-prev');
+
+    // RENDERING AKTUALNEGO PYTANIA
     function renderQuestion() {
         const qData = appState.questions[appState.currentIndex];
         const isMulti = qData.type === 'multi';
-        const savedAnswers = appState.answers[qData.id] || [];
+        const saved = appState.answers[qData.id] || [];
+        const roleNameDisplay = roleDisplayNames[appState.role] || appState.role;
 
-        // Ustawienia licznika i kategorii u góry
+        // Aktualizacja postępu i liczników
         document.getElementById('question-counter').innerText = `Pytanie ${appState.currentIndex + 1} z ${appState.questions.length}`;
-        document.getElementById('question-category').innerText = qData.category === 'general' ? 'Wiedza ogólna (Standardy)' : `Dział specjalistyczny (${appState.role.toUpperCase()})`;
-        document.getElementById('progress').style.width = `${((appState.currentIndex) / appState.questions.length) * 100}%`;
-        
-        // Zarządzanie widocznością przycisku wstecz
+        document.getElementById('progress').style.width = `${(appState.currentIndex / appState.questions.length) * 100}%`;
+        document.getElementById('question-category').innerText = qData.category === 'general' ? 'Wiedza ogólna' : `Stanowisko: ${roleNameDisplay}`;
+
         btnPrev.classList.toggle('hidden', appState.currentIndex === 0);
-        btnNext.innerText = appState.currentIndex === appState.questions.length - 1 ? 'Zakończ i Zapisz' : 'Dalej';
+        btnNext.innerText = appState.currentIndex === appState.questions.length - 1 ? 'Zakończ i Wyślij' : 'Dalej';
 
         let html = `
-            <div class="mb-4">
-                <span class="inline-block px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-md ${isMulti ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-red-50 text-[#C41230] border border-red-100'}">
-                    ${isMulti ? '⚠️ WIELOKROTNY WYBÓR' : 'JEDNOKROTNY WYBÓR'}
-                </span>
-            </div>
-            <div class="text-base font-bold text-gray-800 mb-5 leading-snug">${qData.q}</div>
-            <div class="space-y-3">
+            <h3 class="text-lg md:text-xl font-bold text-white mb-2 relative z-20">${qData.q}</h3>
+            <p class="text-xs text-purple-300/60 mb-5 relative z-20">${isMulti ? '👉 Zaznacz wszystkie pasujące odpowiedzi (wielokrotny wybór)' : '👉 Wybierz tylko jedną prawidłową odpowiedź'}</p>
+            <div class="space-y-3 relative z-20">
         `;
 
-        qData.options.forEach((opt, index) => {
-            const isChecked = savedAnswers.includes(index);
+        qData.options.forEach((opt, idx) => {
+            const isChecked = saved.includes(idx);
             const inputType = isMulti ? 'checkbox' : 'radio';
-            
+
             html += `
-                <label class="flex items-center gap-3 px-4 py-3.5 bg-gray-50 border-2 ${isChecked ? 'border-[#C41230] bg-red-50/20' : 'border-gray-100'} rounded-xl cursor-pointer hover:bg-gray-100/50 transition-all-300">
-                    <input type="${inputType}" name="q_${qData.id}" value="${index}" ${isChecked ? 'checked' : ''} onchange="saveAnswer()" class="w-5 h-5 text-[#C41230] focus:ring-[#C41230] border-gray-300 rounded">
-                    <span class="text-sm font-semibold text-gray-700 leading-tight">${opt}</span>
+                <label class="option-card flex items-center p-4 rounded-xl cursor-pointer ${isChecked ? 'selected' : ''}">
+                    <input type="${inputType}" name="q_opt" value="${idx}" class="w-5 h-5 text-purple-600 bg-zinc-900 border-purple-800 rounded focus:ring-purple-500 accent-purple-500 mr-4" ${isChecked ? 'checked' : ''} onchange="registerChoice()">
+                    <span class="text-sm md:text-base text-zinc-200 select-none">${opt}</span>
                 </label>
             `;
         });
-        html += `</div>`;
+
+        html += '</div>';
         questionContainer.innerHTML = html;
     }
 
-    // AUTOMATYCZNE ZAPISYWANIE WYBORU UŻYTKOWNIKA W LOCIE
-    window.saveAnswer = function() {
+    // REJESTROWANIE WYBORU UŻYTKOWNIKA
+    window.registerChoice = function() {
         const qData = appState.questions[appState.currentIndex];
-        const inputs = document.querySelectorAll(`input[name="q_${qData.id}"]`);
-        let currentSelections = [];
-        
+        const inputs = document.querySelectorAll('input[name="q_opt"]');
+        let selectedIndices = [];
+
         inputs.forEach(input => {
+            const card = input.closest('.option-card');
             if(input.checked) {
-                currentSelections.push(parseInt(input.value));
+                card.classList.add('selected');
+                selectedIndices.push(parseInt(input.value));
+            } else {
+                card.classList.remove('selected');
             }
         });
-        appState.answers[qData.id] = currentSelections;
-        
-        // Natychmiastowe odświeżenie ramek wokół zaznaczonych elementów dla lepszego efektu UX
-        renderQuestion();
+
+        appState.answers[qData.id] = selectedIndices;
     };
 
-    // OBSŁUGA KLIKNIĘĆ DALEJ / COFNIJ
+    // PRZYCISKI NAWIGACJI
     btnNext.addEventListener('click', () => {
-        const currentQId = appState.questions[appState.currentIndex].id;
-        if(!appState.answers[currentQId] || appState.answers[currentQId].length === 0) {
-            showToast('Wybierz przynajmniej jedną odpowiedź przed przejściem dalej!');
+        const qData = appState.questions[appState.currentIndex];
+        const answersForQ = appState.answers[qData.id] || [];
+
+        if(answersForQ.length === 0) {
+            showToast('Zaznacz odpowiedź, aby przejść dalej!', true);
             return;
         }
 
-        if (appState.currentIndex < appState.questions.length - 1) {
+        if(appState.currentIndex < appState.questions.length - 1) {
             appState.currentIndex++;
             renderQuestion();
         } else {
-            finishTest();
+            finishAndSubmit();
         }
     });
 
     btnPrev.addEventListener('click', () => {
-        if (appState.currentIndex > 0) {
+        if(appState.currentIndex > 0) {
             appState.currentIndex--;
             renderQuestion();
         }
     });
 
-    // KONIEC TESTU - OBLICZANIE PUNKTÓW I EXPORT DO ARKUSZA GOOGLE
-    function finishTest() {
-        let genPoints = 0, maxGenPoints = 0;
-        let rolePoints = 0, maxRolePoints = 0;
+    // ZAPIS I PODSUMOWANIE WYNIKÓW
+    function finishAndSubmit() {
+        let generalCorrect = 0;
+        let generalTotal = 0;
+        let roleCorrect = 0;
+        let roleTotal = 0;
 
         appState.questions.forEach(q => {
-            const userAns = (appState.answers[q.id] || []).sort();
-            const correctAns = [...q.correct].sort();
-            const isCorrect = JSON.stringify(userAns) === JSON.stringify(correctAns);
-            
-            if (q.category === 'general') {
-                maxGenPoints++;
-                if(isCorrect) genPoints++;
+            const userSelection = (appState.answers[q.id] || []).sort();
+            const correctSelection = [...q.correct].sort();
+            const isCorrect = JSON.stringify(userSelection) === JSON.stringify(correctSelection);
+
+            if(q.category === 'general') {
+                generalTotal++;
+                if(isCorrect) generalCorrect++;
             } else {
-                maxRolePoints++;
-                if(isCorrect) rolePoints++;
+                roleTotal++;
+                if(isCorrect) roleCorrect++;
             }
         });
 
-        const totalPoints = genPoints + rolePoints;
-        const maxPoints = maxGenPoints + maxRolePoints;
-        const totalPercentage = Math.round((totalPoints / maxPoints) * 100);
-        
-        const genPercentage = maxGenPoints > 0 ? Math.round((genPoints / maxGenPoints) * 100) : 0;
-        const rolePercentage = maxRolePoints > 0 ? Math.round((rolePoints / maxRolePoints) * 100) : 0;
+        const totalPoints = generalCorrect + roleCorrect;
+        const totalMax = generalTotal + roleTotal;
+        const percentage = Math.round((totalPoints / totalMax) * 100);
 
-        // Aktualizacja interfejsu podsumowania
-        document.getElementById('result-name').innerText = `${appState.name} (${appState.role.toUpperCase()})`;
-        document.getElementById('score-display').innerText = `${totalPercentage}%`;
-        document.getElementById('score-display').className = `text-6xl font-black tracking-tighter ${totalPercentage >= 80 ? 'text-green-600' : 'text-[#C41230]'}`;
-        
-        document.getElementById('breakdown-gen').innerText = `${genPoints}/${maxGenPoints} pkt (${genPercentage}%)`;
-        document.getElementById('breakdown-role').innerText = `${rolePoints}/${maxRolePoints} pkt (${rolePercentage}%)`;
-        document.getElementById('score-text').innerText = `${totalPoints} z ${maxPoints} punktów`;
+        const genPercent = generalTotal > 0 ? Math.round((generalCorrect / generalTotal) * 100) : 0;
+        const rolePercent = roleTotal > 0 ? Math.round((roleCorrect / roleTotal) * 100) : 0;
 
-        screenQuiz.classList.add('hidden');
-        screenResult.classList.remove('hidden');
+        // Wyświetlenie wyników w UI
+        document.getElementById('result-name').innerText = appState.name;
+        document.getElementById('result-general').innerText = `${generalCorrect}/${generalTotal} (${genPercent}%)`;
+        document.getElementById('result-role').innerText = `${roleCorrect}/${roleTotal} (${rolePercent}%)`;
+        document.getElementById('result-total').innerText = `${percentage}%`;
 
-        // WYŚLIJ WYNIK DO BAZY GOOGLE SHEETS (BEZPIECZNA METODA URLENCODED)
-        showToast("Wysyłanie wyniku do bazy...", false);
-        
-        // --- KLUCZOWA POPRAWKA DO KOMUNIKACJI Z GOOGLE SHEETS ---
-        // Ponieważ Google Sheets wciąż uparcie próbuje parsować dane jako JSON (ignorując nasze własne instrukcje na serwerze),
-        // dostosowujemy się do jego wymogów i wysyłamy dane zgodnie z preferowanym przez niego formatem, ale wyłączając
-        // tryb no-cors, który był głównym powodem zniekształcenia danych w starszych przeglądarkach.
-        const payload = JSON.stringify({
-            name: appState.name,
-            role: appState.role,
-            score: totalPercentage
-        });
+        // Przełączenie ekranu na wynik końcowy
+        document.getElementById('screen-quiz').classList.add('hidden');
+        document.getElementById('screen-result').classList.remove('hidden');
+
+        // WYSYŁKA DANYCH DO GOOGLE SHEETS
+        showToast('Wysyłanie wyniku do bazy danych...');
+
+        const params = new URLSearchParams();
+        params.append('name', appState.name);
+        params.append('role', appState.role);
+        params.append('score', percentage);
 
         fetch(WEB_APP_URL, {
-            method: "POST",
-            // Usuwamy opcję mode: "no-cors", ponieważ powoduje ona utratę nagłówków przez co serwer nie wie jak czytać dane.
+            method: 'POST',
+            mode: 'no-cors', // Ominięcie blokad CORS w przeglądarkach
             headers: {
-                "Content-Type": "text/plain;charset=utf-8" // Używamy text/plain, aby pominąć problem z CORS na urządzeniach mobilnych
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: payload
-        }).then(response => {
-             // Nawet jeśli wystąpi błąd sieci, to jeśli zapytanie doszło do serwera, my oznaczamy sukces
-             showToast("Wynik bezpiecznie zapisany w chmurze!", false);
-        }).catch(err => {
-            console.error("Błąd zapisu w Google Sheets:", err);
-            // Wyświetlamy sukces mimo wyjątku CORS (jeśli no-cors jest wyłączone, na niektórych telefonach może wyrzucić błąd
-            // choć dane i tak docierają na serwer. Najważniejsze, że JSON.parse w arkuszu już nie zgłosi błędu).
-            showToast("Wynik bezpiecznie zapisany w chmurze!", false); 
+            body: params
+        })
+        .then(() => {
+            showToast('Wynik pomyślnie zapisany w chmurze!');
+        })
+        .catch(err => {
+            showToast('Błąd zapisu w chmurze. Spróbuj ponownie.', true);
+            console.error('Błąd zapisu sieciowego:', err);
         });
+    }
+
+    // Bezpieczne renderowanie tekstu (XSS Protection)
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 </script>
 
