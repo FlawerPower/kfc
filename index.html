@@ -312,8 +312,22 @@
                     return;
                 }
 
+                // Bezpieczne i inteligentne filtrowanie wierszy z błędami w arkuszu (np. zawierających krzyżyk lub napisy o błędach)
+                const cleanData = data.filter(user => 
+                    user.name && 
+                    !user.name.includes('❌') && 
+                    !user.name.includes('BŁĄD') && 
+                    !user.name.includes('SYSTEM') && 
+                    !isNaN(user.score)
+                );
+
+                if(cleanData.length === 0) {
+                    emptyEl.classList.remove('hidden');
+                    return;
+                }
+
                 // Bezpieczne przycinanie tylko do TOP 5 wyników na froncie
-                const top5 = data.slice(0, 5);
+                const top5 = cleanData.slice(0, 5);
 
                 let html = '';
                 top5.forEach((user, index) => {
@@ -546,24 +560,27 @@
         // WYSYŁKA DANYCH DO GOOGLE SHEETS
         showToast('Wysyłanie wyniku do bazy danych...');
 
-        const params = new URLSearchParams();
-        params.append('name', appState.name);
-        params.append('role', appState.role);
-        params.append('score', percentage);
-
+        // Trikiem jest wysłanie bezpiecznego i poprawnie ustrukturyzowanego dokumentu JSON pod przykryciem 'text/plain'.
+        // Dzięki temu żądanie omija restrykcje CORS i preflightu, a chmura Google bezbłędnie je dekoduje (niezależnie od aktualnej wersji wdrożenia).
         fetch(WEB_APP_URL, {
             method: 'POST',
-            mode: 'no-cors', // Ominięcie blokad CORS w przeglądarkach
+            mode: 'no-cors', 
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'text/plain'
             },
-            body: params
+            body: JSON.stringify({
+                name: appState.name,
+                role: appState.role,
+                score: percentage
+            })
         })
         .then(() => {
             showToast('Wynik pomyślnie zapisany w chmurze!');
+            // Odświeżamy ranking w tle, aby od razu zobaczyć zaktualizowaną tabelę liderów
+            setTimeout(loadLeaderboard, 1500);
         })
         .catch(err => {
-            showToast('Błąd zapisu w chmurze. Spróbuj ponownie.', true);
+            showToast('Błąd połączenia. Wynik nie został zapisany.', true);
             console.error('Błąd zapisu sieciowego:', err);
         });
     }
