@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- AGRESYWNE BLOKOWANIE PAMIĘCI PODRĘCZNEJ (CACHE BUSTING) -->
+    <!-- Dzięki temu masz pewność, że przeglądarka zawsze załaduje najnowszy kod -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <title>KFC - Test ze Standardów</title>
     <!-- Tailwind CSS do szybkiego pozycjonowania i responsywności -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -296,13 +303,16 @@
         loadLeaderboard();
     };
 
-    // FUNKCJA: Pobieranie rankingu TOP 5 z arkusza
+    // FUNKCJA: Pobieranie rankingu TOP 5 z arkusza z Cache Busterem
     function loadLeaderboard() {
         const loadingEl = document.getElementById('leaderboard-loading');
         const emptyEl = document.getElementById('leaderboard-empty');
         const listEl = document.getElementById('leaderboard-list');
 
-        fetch(WEB_APP_URL)
+        // Unikalny timestamp wymusza na przeglądarce ominięcie cache
+        const cacheBusterUrl = WEB_APP_URL + "?nocache=" + new Date().getTime();
+
+        fetch(cacheBusterUrl)
             .then(res => res.json())
             .then(data => {
                 loadingEl.classList.add('hidden');
@@ -312,7 +322,7 @@
                     return;
                 }
 
-                // Bezpieczne i inteligentne filtrowanie wierszy z błędami w arkuszu (np. zawierających krzyżyk lub napisy o błędach)
+                // Bezpieczne i inteligentne filtrowanie wierszy z błędami w arkuszu
                 const cleanData = data.filter(user => 
                     user.name && 
                     !user.name.includes('❌') && 
@@ -326,7 +336,7 @@
                     return;
                 }
 
-                // Bezpieczne przycinanie tylko do TOP 5 wyników na froncie
+                // Bezpieczne przycinanie tylko do TOP 5 wyników
                 const top5 = cleanData.slice(0, 5);
 
                 let html = '';
@@ -560,9 +570,11 @@
         // WYSYŁKA DANYCH DO GOOGLE SHEETS
         showToast('Wysyłanie wyniku do bazy danych...');
 
-        // Trikiem jest wysłanie bezpiecznego i poprawnie ustrukturyzowanego dokumentu JSON pod przykryciem 'text/plain'.
-        // Dzięki temu żądanie omija restrykcje CORS i preflightu, a chmura Google bezbłędnie je dekoduje (niezależnie od aktualnej wersji wdrożenia).
-        fetch(WEB_APP_URL, {
+        // Trikiem omijającym absolutnie wszystkie cache przeglądarki jest dodanie do linku parametru ?t=timestamp
+        // Dzięki temu przeglądarka uzna, że wysyła dane na nowy adres i użyje świeżego kodu.
+        const noCacheSubmitUrl = WEB_APP_URL + "?t=" + new Date().getTime();
+
+        fetch(noCacheSubmitUrl, {
             method: 'POST',
             mode: 'no-cors', 
             headers: {
