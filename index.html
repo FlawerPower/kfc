@@ -3,28 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- AGRESYWNE BLOKOWANIE PAMIĘCI PODRĘCZNEJ (CACHE BUSTING) -->
-    <!-- Dzięki temu masz pewność, że przeglądarka zawsze załaduje najnowszy kod -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-
     <title>KFC - Test ze Standardów</title>
-    <!-- Tailwind CSS do szybkiego pozycjonowania i responsywności -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --bg-color: #050706; /* Głęboka nocna czerń */
-            --surface-color: rgba(14, 11, 20, 0.94); /* Bardzo ciemny grafit z nutą fioletu */
-            --border-neon: #a855f7; /* Jasny fioletowy neon */
+            --bg-color: #050706;
+            --surface-color: rgba(14, 11, 20, 0.95);
+            --border-neon: #a855f7;
             --text-color: #f3f4f6;
             --border-radius: 16px;
         }
 
         body {
-            /* Przyciemniamy tło las.jpg bezpośrednio w gradiencie, co daje genialny efekt nocy i doskonałą czytelność */
-            background-image: linear-gradient(rgba(5, 7, 6, 0.85), rgba(5, 7, 6, 0.91)), url('las.jpg');
+            background-image: linear-gradient(rgba(5, 7, 6, 0.88), rgba(5, 7, 6, 0.93)), url('las.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -37,9 +31,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        /* WŁAŚCIWY KONTENER TESTU */
         .glass-panel {
             background-color: var(--surface-color);
             border: 2px solid var(--border-neon);
@@ -50,42 +45,24 @@
             z-index: 10;
         }
 
-        /* KULOODPORNY NEON (Oddzielna warstwa emitująca potężne światło pod kontenerem, niezależna od renderowania filtrów szkła) */
         .neon-glow-behind {
             position: absolute;
-            inset: -2px; /* Lekko wystaje poza krawędzie obwódki */
+            inset: -2px;
             background: linear-gradient(45deg, #a855f7, #7c3aed, #d8b4fe);
             border-radius: var(--border-radius);
-            z-index: 1; /* Pod glass-panel */
+            z-index: 1;
             filter: blur(15px);
             animation: intenseGlow 3s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @keyframes intenseGlow {
-            0% { 
-                opacity: 0.6; 
-                filter: blur(12px); 
-                transform: scale(1); 
-            }
-            100% { 
-                opacity: 1; 
-                filter: blur(20px); 
-                transform: scale(1.015); 
-            }
+            0% { opacity: 0.5; filter: blur(12px); transform: scale(1); }
+            100% { opacity: 0.9; filter: blur(22px); transform: scale(1.015); }
         }
 
-        /* Subtelny glow na tekście (poprawiona czytelność) */
-        .neon-text-main {
-            color: #ffffff;
-            text-shadow: 0 0 4px rgba(168, 85, 247, 0.5); 
-        }
+        .neon-text-main { color: #ffffff; text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 10px #a855f7; }
+        .neon-text-sub { color: #e9d5ff; text-shadow: 0 0 3px rgba(168, 85, 247, 0.5); }
 
-        .neon-text-sub {
-            color: #e9d5ff;
-            text-shadow: 0 0 2px rgba(168, 85, 247, 0.3);
-        }
-
-        /* Przyciski */
         .neon-btn-primary {
             background: linear-gradient(135deg, #7c3aed, #581c87);
             border: 1px solid #c084fc;
@@ -99,7 +76,6 @@
         }
         .neon-btn-primary:active { transform: translateY(1px); }
 
-        /* Opcje odpowiedzi */
         .option-card {
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             border: 1px solid rgba(124, 58, 237, 0.2);
@@ -116,7 +92,6 @@
             box-shadow: 0 0 18px rgba(168, 85, 247, 0.45), inset 0 0 8px rgba(139, 92, 246, 0.25);
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #09070f; }
         ::-webkit-scrollbar-thumb { background: #581c87; border-radius: 3px; }
@@ -127,6 +102,9 @@
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        .tab-active { border-bottom: 2px solid #a855f7; color: #fff; }
+        .tab-inactive { color: #a1a1aa; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -134,19 +112,15 @@
 <!-- SYSTEM TOASTÓW -->
 <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
 
-<!-- WRAPPER KONTENERA (Pozwala na rozdzielenie poświaty i szkła) -->
+<!-- GŁÓWNY WRAPPER -->
 <div class="relative w-full max-w-xl my-6 fade-in">
-    
-    <!-- POTĘŻNY NEONOWY GLOW (Znajduje się pod spodem panela, dając 100% gwarancji świecenia) -->
     <div class="neon-glow-behind"></div>
 
-    <!-- GŁÓWNY KONTENER TESTU -->
     <div class="glass-panel w-full p-6 md:p-8">
         
         <!-- EKRAN 1: START -->
         <div id="screen-start">
             <div class="text-center mb-6">
-                <!-- Klimatyczne minimalistyczne logo z silną neonową poświatą -->
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-950/40 border border-purple-500/70 mb-4 shadow-[0_0_20px_rgba(168,85,247,0.4)] relative z-20">
                     <svg class="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -159,7 +133,7 @@
             <div class="space-y-4 mb-6 relative z-20">
                 <div>
                     <label class="block text-sm font-semibold text-purple-200 mb-1" for="userName">Imię i pierwsza litera nazwiska:</label>
-                    <input type="text" id="userName" class="w-full bg-zinc-950/80 border border-purple-900/60 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 focus:shadow-[0_0_10px_rgba(168,85,247,0.2)] transition-all" placeholder="np. Jan K." required>
+                    <input type="text" id="userName" class="w-full bg-zinc-950/80 border border-purple-900/60 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all" placeholder="np. Jan K." required>
                 </div>
                 
                 <div>
@@ -177,37 +151,35 @@
                 Rozpocznij Test
             </button>
 
-            <!-- SEKCJA RANKINGU TOP 5 -->
+            <!-- RANKING -->
             <div class="mt-8 pt-6 border-t border-purple-950/60 relative z-20">
                 <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2 justify-center">
-                    <span class="text-purple-400">🏆</span> <span class="neon-text-sub">Ranking TOP 5 Pracowników</span>
+                    <!-- Kliknięcie 3 razy w pucharek poniżej wywołuje Panel Managera -->
+                    <span onclick="triggerManagerCheck()" class="text-purple-400 cursor-pointer hover:scale-125 active:scale-95 transition-all inline-block select-none">🏆</span> <span class="neon-text-sub">Ranking TOP 5</span>
                 </h2>
                 <div id="leaderboard-loading" class="text-center py-4 text-purple-300/50 text-sm">Wczytywanie tabeli liderów...</div>
-                <div id="leaderboard-empty" class="text-center py-4 text-purple-300/50 text-sm hidden">Brak zapisanych wyników. Bądź pierwszy!</div>
-                <div id="leaderboard-list" class="space-y-2.5 hidden">
-                    <!-- Generowane dynamicznie -->
-                </div>
+                <div id="leaderboard-empty" class="text-center py-4 text-purple-300/50 text-sm hidden">Brak wyników. Bądź pierwszy!</div>
+                <div id="leaderboard-list" class="space-y-2.5 hidden"></div>
             </div>
         </div>
 
         <!-- EKRAN 2: QUIZ -->
         <div id="screen-quiz" class="hidden relative z-20">
-            <!-- Pasek postępu -->
             <div class="w-full h-1.5 bg-zinc-950 rounded-full mb-5 overflow-hidden">
                 <div id="progress" class="h-full bg-gradient-to-r from-purple-600 to-fuchsia-500 w-0 transition-all duration-300 shadow-[0_0_8px_#a855f7]"></div>
             </div>
+            
             <div class="flex justify-between items-center mb-6">
                 <span id="question-category" class="px-2.5 py-1 bg-purple-950/60 border border-purple-600/40 text-purple-200 text-xs font-semibold rounded-full uppercase tracking-wider shadow-[0_0_6px_rgba(124,58,237,0.15)]">Część ogólna</span>
-                <span id="question-counter" class="text-xs text-purple-300/70">Pytanie 1 z 10</span>
+                <span id="timer-display" class="text-sm font-black text-purple-300 bg-zinc-900/80 px-3 py-1 rounded-lg border border-purple-800/50 transition-colors duration-300">⏱️ 60s</span>
             </div>
             
-            <div id="question-container" class="fade-in">
-                <!-- Pytanie i opcje renderowane przez silnik JS -->
-            </div>
+            <p id="question-counter" class="text-xs text-purple-300/70 mb-2">Pytanie 1 z 10</p>
+            
+            <div id="question-container" class="fade-in"></div>
 
-            <div class="flex gap-4 mt-8">
-                <button id="btn-prev" class="w-1/3 py-3.5 bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 font-bold rounded-xl border border-zinc-800 transition-all active:scale-[0.98] hidden">Wstecz</button>
-                <button id="btn-next" class="flex-1 py-3.5 neon-btn-primary text-white font-extrabold rounded-xl transition-all active:scale-[0.98]">Dalej</button>
+            <div class="mt-8">
+                <button id="btn-next" class="w-full py-3.5 neon-btn-primary text-white font-extrabold rounded-xl transition-all active:scale-[0.98]">Zatwierdź i przejdź Dalej</button>
             </div>
         </div>
 
@@ -219,8 +191,8 @@
                 </div>
                 <h1 class="text-2xl md:text-3xl font-extrabold text-white neon-text-main">Test Ukończony!</h1>
                 <p id="result-name" class="text-purple-300 font-semibold text-lg mt-1.5"></p>
+                <p id="cheat-warning" class="text-red-500 font-bold text-sm mt-2 hidden">🚩 Zarejestrowano próby oszustwa (utrata okna)!</p>
                 
-                <!-- Wyniki procentowe i punktowe z rozbiciem na kategorie -->
                 <div class="my-6 p-5 bg-zinc-950/70 border border-purple-950/80 rounded-2xl space-y-4 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
                     <div class="flex justify-between items-center pb-3 border-b border-purple-950/40">
                         <span class="text-purple-200/80 font-medium text-sm">Wiedza ogólna:</span>
@@ -236,243 +208,346 @@
                     </div>
                 </div>
 
-                <p class="text-purple-300/60 text-sm px-4 mb-6">Twoje punkty zostały automatycznie wysłane do bazy danych Managera.</p>
-                
+                <p class="text-purple-300/60 text-sm px-4 mb-6">Twoje punkty oraz statystyki błędów zostały przesłane do bazy danych.</p>
                 <button onclick="location.reload()" class="w-full py-4 bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-white font-bold rounded-xl transition-all">
-                    Rozpocznij Nowy Test
+                    Zakończ Sesję
                 </button>
             </div>
         </div>
+
+        <!-- UKRYTY PANEL MANAGERA -->
+        <div id="screen-manager" class="hidden relative z-20">
+            <h2 class="text-xl font-bold text-white mb-4 neon-text-main flex items-center justify-between">
+                <span>🛡️ Panel Managera</span>
+                <button onclick="closeManager()" class="text-zinc-400 hover:text-white text-sm bg-zinc-800 px-3 py-1 rounded">Wyjdź</button>
+            </h2>
+            
+            <!-- Zakładki -->
+            <div class="flex border-b border-purple-950 mb-4">
+                <button id="tab-users" class="flex-1 py-2 font-semibold text-sm tab-active transition-colors" onclick="switchManagerTab('users')">Lista Pracowników</button>
+                <button id="tab-stats" class="flex-1 py-2 font-semibold text-sm tab-inactive transition-colors" onclick="switchManagerTab('stats')">Statystyki Błędów</button>
+            </div>
+
+            <!-- Widok: Lista pracowników -->
+            <div id="view-users" class="block">
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="manager-search" placeholder="Szukaj..." class="flex-1 bg-zinc-900 border border-purple-950 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500">
+                    <select id="manager-filter" class="bg-zinc-900 border border-purple-950 rounded-lg px-2 py-2 text-white text-sm">
+                        <option value="all">Wszyscy</option>
+                        <option value="cheaters">Oflagowani 🚩</option>
+                        <option value="kuchnia">Kuchnia</option>
+                        <option value="front">Front</option>
+                        <option value="serwis">Serwis</option>
+                    </select>
+                </div>
+                <div id="manager-list" class="space-y-2 max-h-[45vh] overflow-y-auto pr-1 text-sm">
+                    <div class="text-center py-8 text-purple-300/40 animate-pulse">Łączenie z bazą Google Sheets...</div>
+                </div>
+            </div>
+
+            <!-- Widok: Statystyki Błędów -->
+            <div id="view-stats" class="hidden">
+                <p class="text-xs text-purple-300/70 mb-3">Zestawienie najczęściej mylonych standardów przez załogę. Idealne do przeprowadzenia odprawy (Travel Path).</p>
+                <div id="manager-stats-list" class="space-y-3 max-h-[45vh] overflow-y-auto pr-1 text-sm">
+                    <!-- Generowane dynamicznie -->
+                </div>
+            </div>
+
+        </div>
+
     </div>
 </div>
 
 <script>
-    // TWOJA BAZA DANYCH GOOGLE SHEETS
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxk3On3PlbyAd7Qz9kW6Wt6xrxxBaomQkkuVzm_bWzWSN1wOw8K6qX0iU-CnGsj0HGe/exec";
+    // ZAKTUALIZOWANY URL BAZY DANYCH (Z TWOIM NOWYM KODEM WDROŻENIA GOOGLE /EXEC)
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxH5RFOfQUj781emGWjtp8-Mvc4NquT5NMrDp5ttlPZay0xboKUYPMSlyI1FFWdn5Tc/exec";
 
-    // BAZA PYTAŃ OPERACYJNYCH
+    // Konfiguracja wylosowanych pytań: 3 ogólne + 5 stanowiskowych = 8 pytań łącznie na test testowy
+    const CONFIG = { generalCount: 3, roleCount: 5, timePerQuestion: 60 };
+    const roleDisplayNames = { kuchnia: "Kuchnia", front: "Front", serwis: "Serwis" };
+
+    // BAZA PYTAŃ - Zaimportowano 100% realnych pytań z dostarczonego pliku PDF z zachowaniem ich oryginalnego przypisania
     const questionBank = {
         general: [
-            { id: 'g1', type: 'single', q: 'Jak długo trwa proceduralne mycie rąk w KFC?', options: ['5 sekund', '20 sekund (samo wcieranie mydła)', '60 sekund', 'Zależy od stanowiska'], correct: [1] },
-            { id: 'g2', type: 'single', q: 'Zgodnie z zasadą FIFO, które produkty należy zużyć w pierwszej kolejności?', options: ['Te o najwyższej wartości Food Cost', 'Te stojące najbliżej krawędzi półki', 'Te z najkrótszym terminem przydatności lub przyjęte najwcześniej'], correct: [2] },
-            { id: 'g3', type: 'multi', q: 'Wybierz filary standardu gościnności i operacji CHAMPS (zaznacz 2 prawidłowe):', options: ['Cleanliness (Czystość)', 'Marketing (Reklama)', 'Speed (Szybkość)', 'Safety (Ochrona BHP)'], correct: [0, 2] }
+            { id: 'g1', type: 'single', q: 'Co oznacza skrót FOH?', options: ['Food of House', 'Front of House', 'Fast Order Hub', 'First on Hand'], correct: [1] },
+            { id: 'g2', type: 'single', q: 'Jak w KFC nazywamy kuchnię i zaplecze restauracji?', options: ['MOH', 'FOH', 'HOH', 'Backstage'], correct: [2] },
+            { id: 'g3', type: 'single', q: 'Co w nomenklaturze KFC oznacza skrót MOH?', options: ['Middle of House (serwis)', 'Manager of House', 'Main Order Hub', 'Meat on Heat'], correct: [0] },
+            { id: 'g4', type: 'single', q: 'Jak nazywają się godziny, podczas których restaurację odwiedza najwięcej Gości?', options: ['Rush Hour', 'Peak Time', 'Busy Time', 'SOS Time'], correct: [1] },
+            { id: 'g5', type: 'single', q: 'Jak brzmi główna Wizja Obsługi Gości w KFC?', options: ['Serwujemy najszybsze jedzenie w mieście.', 'Sprawiamy, że nasi Goście czują się świetnie.', 'Zawsze gorące i świeże.', 'Sprzedajemy najwächst kurczaków na świecie.'], correct: [1] },
+            { id: 'g6', type: 'single', q: 'Czym w restauracji jest "Sugestia"?', options: ['Skrzynką na zażalenia od Gości.', 'Miejscem, gdzie możesz zostawić swoje preferowane godziny pracy.', 'Nowym produktem w menu testowym.', 'Sugerowaną sprzedażą (upsellingiem) na kasie.'], correct: [3] },
+            { id: 'g7', type: 'single', q: 'Które z poniższych NIE JEST jednym z trzech głównych Filarów Obsługi w KFC?', options: ['Bądź skuteczny', 'Okazuj troskę', 'Pracuj najszybciej jak to możliwe', 'Budź zachwyt'], correct: [2] },
+            { id: 'g8', type: 'single', q: 'Do którego filaru obsługi przypisane jest hasło "Jakość / Bycie ekspertem"?', options: ['Bądź skuteczny', 'Okazuj troskę', 'Budź zachwyt', 'Wizja Obsługi'], correct: [0] },
+            { id: 'g9', type: 'single', q: 'Do którego filaru obsługi przypisane jest hasło "Interakcja z Gościem"?', options: ['Bądź skuteczny', 'Budź zachwyt', 'Zawsze z uśmiechem', 'Okazuj troskę'], correct: [3] },
+            { id: 'g10', type: 'single', q: 'Jak nazywa się miejsce, gdzie przechowujemy produkty wymagające temperatury pokojowej?', options: ['Magazyn Chłodniczy', 'Chłodnia', 'Magazyn Suchy', 'Spiżarnia'], correct: [2] },
+            { id: 'g11', type: 'single', q: 'Co w gastronomii i standardach KFC oznacza zasada FIFO (First In, First Out)?', options: ['"Pierwsze zrobione, pierwsze wydane" - zasada priorytetyzacji zamówień', '"Pierwsze weszło, pierwsze wyszło" - produkty z najkrótszą datą ważności zużywamy najpierw', '"Pierwszy na zmianie, pierwszy wychodzi" - system rotacji przerw', 'Jest to specjalne oznaczenie strefy dostaw'], correct: [1] },
+            { id: 'g12', type: 'single', q: 'Hasło "Wykraczaj poza i ponad standardy" definiuje w KFC:', options: ['Złotą Zasadę Jakości.', 'Filar obsługi "Budź zachwyt".', 'Wizję Obsługi Gości.', 'Definicję Peak Time.'], correct: [1] },
+            { id: 'g13', type: 'single', q: 'W dokumencie opisującym Filary Obsługi, jakie konkretnie inicjatywy wprowadzają w życie filar "Bądź skuteczny"?', options: ['Tylko i wyłącznie Szybkość Obsługi (SOS).', 'Smak i Czystość.', 'Rozmowa z Gościem.', 'Niespodzianki dla dzieci.'], correct: [1] },
+            { id: 'g14', type: 'single', q: 'Według oficjalnego słowniczka, jak precyzyjnie tłumaczymy skrót SOS?', options: ['Czas oczekiwania na produkt od momentu nabicia.', 'Szybkość obsługi (Speed of Service).', 'Standaryzacja obsługi sali.', 'Save Our Service (procedura awaryjna).'], correct: [1] }
         ],
         roles: {
             kuchnia: [
-                { id: 'k1', type: 'single', q: 'Co oznacza liczba 10 w legendarnej procedurze panierowania 7-10-7?', options: ['Smażenie przez 10 minut', '10-krotne zanurzenie/wstrząśnięcie w wodzie', '10 ruchów dłonią przy mieszaniu mąki'], correct: [1] },
-                { id: 'k2', type: 'single', q: 'Jaka jest prawidłowa wewnętrzna temperatura usmażonego kurczaka?', options: ['Minimum 65°C', 'Minimum 82°C (krytyczny punkt CCP)', 'Dokładnie 100°C'], correct: [1] },
-                { id: 'k3', type: 'multi', q: 'Które produkty są przygotowywane w kuchni we frytownicach ciśnieniowych? (zaznacz wszystkie)', options: ['Kawałki kurczaka Original Recipe z kością', 'Frytki koszykowe', 'Strips (pikantne polędwiczki)'], correct: [0] }
+                { id: 'k1', type: 'single', q: 'Czym są "smallwaresy"?', options: ['Małe gadżety dla dzieci dodawane do zestawów.', 'Drobne monety w kasie.', 'Narzędzia i sprzęty używane do przygotowania żywności.', 'Małe porcje frytek.'], correct: [2] },
+                { id: 'k2', type: 'single', q: 'Jak nazywa się miejsce, w którym myjemy sprzęty zgodnie z metodą 3 zlewów?', options: ['Zmywak', 'Sanitizer', 'Washroom', 'Back-sink'], correct: [0] },
+                { id: 'k3', type: 'single', q: 'Jaka jest fundamentalna zasada zmywaka w KFC?', options: ['Wszystko ląduje w zmywarce wyparzającej.', 'Myjemy metodą 2 zlewów (mycie i płukanie).', 'Myjemy metodą 3 zlewów (mycie, płukanie, dezynfekcja).', 'Myjemy tylko gorącą wodą pod ciśnieniem.'], correct: [2] },
+                { id: 'k4', type: 'single', q: 'W procesie panierowania metodą 7-10-7, co oznacza liczba "10"?', options: ['Smażenie przez 10 minut', '10-krotne wstrząśnięcie koszykiem z kurczakiem w wodzie w celu usunięcia nadmiaru mąki', '10 ruchów dłonią przy mieszaniu mąki', 'Użycie 10 różnych przypraw w mące'], correct: [1] },
+                { id: 'k5', type: 'single', q: 'Jaka jest prawidłowa wewnętrzna temperatura usmażonego kurczaka (np. Bites, Strips, kawałki Original Recipe), aby produkt został uznany za bezpieczny i gotowy do wydania?', options: ['Minimum 82°C (180°F)', 'Minimum 65°C (149°F)', 'Minimum 100°C (212°F)', 'Dokładnie 74°C (165°F)'], correct: [0] },
+                { id: 'k6', type: 'single', q: 'Które produkty są przygotowywane w kuchni we frytownicach ciśnieniowych?', options: ['Kawałki kurczaka Original Recipe z kością', 'Frytki koszykowe', 'Strips (pikantne polędwiczki)', 'Bites (kęski z kurczaka)'], correct: [0] }
             ],
             front: [
-                { id: 'f1', type: 'single', q: 'Jak reagujemy na zgłoszenie zimnych frytek lub pomyłki w zamówieniu na lobby?', options: ['Natychmiast przepraszamy i wymieniamy produkt na świeży', 'Prosimy o dowód zakupu i wypełnienie reklamacji', 'Tłumaczymy, że frytki przed chwilą wyszły z frytownicy'], correct: [0] },
-                { id: 'f2', type: 'single', q: 'Czy na jednej kasetce kasowej w tym samym czasie może pracować dwóch kasjerów?', options: ['Tak, podczas piku sprzedażowego', 'Nie, jest to kategorycznie zabronione standardem gotówkowym'], correct: [1] },
-                { id: 'f3', type: 'multi', q: 'Co wchodzi w skład poprawnego standardu sugerowania (up-sellingu)? (zaznacz 2 odpowiedzi)', options: ['Sugerowanie powiększenia zestawu lub dołożenia sosu', 'Przymuszenie gościa do zamówienia deseru na koniec', 'Zaproponowanie dodatku komplementarnego do kupowanego dania'], correct: [0, 2] }
+                { id: 'f1', type: 'single', q: 'Według standardu Deployment, co to są "zadania pierwszorzędne"?', options: ['Mycie tacek i podłóg w restauracji.', 'Zadania bezpośrednio związane z obsługą Gości (np. wydawanie jedzenia).', 'Przyjmowanie dostawy i liczenie towaru.', 'Zliczanie kasy po zakończeniu zmiany.'], correct: [1] },
+                { id: 'f2', type: 'single', q: 'Jaki jest maksymalny dopuszczalny czas na sprzątnięcie stolika na lobby po opuszczeniu go przez Gości?', options: ['Zanim pojawi się kolejny Gość.', '2 minuty.', '5 minut.', 'Maksymalnie 15 minut.'], correct: [1] },
+                { id: 'f3', type: 'single', q: 'Co musisz zrobić z zadaniami drugorzędnymi (np. uzupełnianie kubków i słomek), gdy do kasy podchodzi Gość?', options: ['Kontynuować aż uzupełnisz całą stację.', 'Poprosić Gościa, żeby chwilę poczekał.', 'Natychmiast przerwać to zadanie, ponieważ obsługa Gościa ma priorytet.', 'Zawołać kogoś z kuchni, by obsłużył kasę.'], correct: [2] },
+                { id: 'f4', type: 'single', q: 'Co oznacza komunikat "Błędny PIN" na terminalu płatniczym?', options: ['Awarię systemu w całej restauracji.', 'Kartę należy natychmiast zatrzymać i zablokować.', 'Posiadacz karty podał zły kod, transakcję należy po prostu powtórzyć.', 'Należy zawołać managera i spisać protokół incydentu.'], correct: [2] },
+                { id: 'f5', type: 'single', q: 'Jaka nagroda gwarantowana przysługuje Gościowi za wypełnienie ankiety satysfakcji GFP (pod warunkiem zakupu wymaganego zestawu)?', options: ['Dowolna kanapka z menu.', 'Klasyczny Twister.', 'Duże frytki.', 'Zniżka 50% na kolejne zamówienie.'], correct: [1] },
+                { id: 'f6', type: 'single', q: 'Jakim pojęciem w KFC określamy "płynne przechodzenie między stanowiskami w zależności od potrzeb restauracji"?', options: ['SOS (Speed of Service)', 'Rush Hour', 'Step in & step out', 'Peak Time'], correct: [2] },
+                { id: 'f7', type: 'single', q: 'Czy jako kasjer masz prawo spisać dane z karty płatniczej Gościa (np. na kartce) w przypadku problemów z połączeniem terminala?', options: ['Tak, ale tylko za wyraźną zgodą Gościa.', 'Nigdy nie wolno spisywać danych z kart płatniczych.', 'Tak, ale wyłącznie po to, by przekazać je managerowi do ręcznego wbicia.', 'Można to zrobić tylko w przypadku globalnej awarii prądu.'], correct: [1] },
+                { id: 'f8', type: 'single', q: 'Jaka zasada dostępności dotyczy produktów promocyjnych podczas trwania danej kampanii marketingowej?', options: ['Gdy się skończą, po prostu proponujemy zamiennik ze stałego menu.', 'Muszą być dostępne przez cały czas trwania promocji, bez wyjątku.', 'Trzymamy je na holdingu tylko w godzinach szczytu.', 'Nie obowiązują ich ramy czasowe SOS.'], correct: [1] },
+                { id: 'f9', type: 'single', q: 'Gość zamawia rano produkt, którego nie ma aktualnie na holdingu (np. Grandera). Jeśli zdecyduje się na niego poczekać, co powinieneś mu zaproponować w ramach "Super Service"?', options: ['Obniżkę ceny produktu.', 'Darmowe powiększenie frytek.', 'Poczęstowanie darmowym napojem lub ciastkiem w ramach podziękowania za cierpliwość.', 'Zniżkę pracowniczą.'], correct: [2] },
+                { id: 'f10', type: 'single', q: 'Płatność kartą zostaje odrzucona z komunikatem „Odmowa". Gość denerwuje się i żąda wyjaśnień, dlaczego tak się stało. Co powinieneś zrobić?', options: ['Zadzwonić na wsparcie IT w sprawie awarii terminala.', 'Poinformować z uśmiechem, że powód powinien być na wydruku, a po szczegóły Gość musi zwrócić się do swojego banku.', 'Poprosić Gościa o podanie PIN-u, żebyś mógł wpisać go osobiście.', 'Zresetować terminal, odłączając go od zasilania.'], correct: [1] },
+                { id: 'f11', type: 'single', q: 'Zgodnie z regulaminem Ankiety Satysfakcji Gości (GFP), do zakupu jakiego produktu NIE MOŻNA odebrać darmowego Twistera z ankiety?', options: ['Kubełka Classic.', 'Zestawu B-smart.', 'Grander Boxa.', 'Zestawu z Zingerem.'], correct: [1] },
+                { id: 'f12', type: 'single', q: 'Znajomy po posiłku zostawił swój paragon na stoliku. Na paragonie widnieje zaproszenie do ankiety GFP. Czy jako pracownik możesz wziąć ten paragon i wypełnić ankietę w domu w imieniu Gościa?', options: ['Tak, pod warunkiem, że zrobisz to z prywatnego telefonu po pracy.', 'Nie, pracownikom firm AmRest oraz ich rodzinom surowo zabrania się wypełniania ankiet GFP.', 'Tak, ale tylko z wiedzą Kierownika Zmiany.', 'Tak, ponieważ zależy nam na poprawieniu punktacji restauracji.'], correct: [1] },
+                { id: 'f13', type: 'single', q: 'Pracujesz w restauracji przyjmującej walutę Euro. Zgodnie z limitami, ile maksymalnie Euro w banknotach może znajdować się w Twojej szufladzie kasowej?', options: ['20 Euro', '50 Euro', '100 Euro', '200 Euro'], correct: [1] },
+                { id: 'f14', type: 'single', q: 'Przygotowujesz produkt świeżo smażony "na życzenie", na który Gość cierpliwie czeka. Kiedy produkt jest gotowy, w jaki sposób masz mu go wydać?', options: ['Głośno wywołać numer zamówienia zza lady kasy i czekać.', 'Skompletować zamówienie i od razu zanieść je Gościowi bezpośrednio do stolika, z podziękowaniem.', 'Zostawić produkt na tacy na serwisie i zacząć obsługiwać kolejną osobę.', 'Odszukać Gościa i poprosić go o powrót do kasy po odbiór.'], correct: [1] },
+                { id: 'f15', type: 'single', q: 'Podczas standardowego mycia pompek (bez demontażu), w pierwszym kroku używamy 1 litra roztworu myjącego. Co musisz zrobić zaraz po tym, a ZANIM przejdziesz do dezynfekcji?', options: ['Zostawić pompkę do całkowitego wyschnięcia.', 'Przepompować około 0,5 litra czystej, ciepłej wody.', 'Włożyć pompkę do zmywarki z wrzątkiem.', 'Rozkręcić kolanko dozujące.'], correct: [1] },
+                { id: 'f16', type: 'single', q: 'W procesie standardowego mycia pompki przepompowujemy 1 litr dezynfekcji. Jaki jest OSTATNI krok przed uznaniem pompki za gotową do użytku?', options: ['Pompka musi samodzielnie wyschnąć.', 'Należy przepompować przez nią wrzątek.', 'Należy przepompować około 250 ml ciepłej wody, żeby wypłukać resztki dezynfekcji.', 'Należy przepuścić przez nią pierwszą pompkę sosu i wyrzucić go do kosza.'], correct: [2] },
+                { id: 'f17', type: 'single', q: 'Rozpoczynając mycie pompek Z DEMONTAŻEM, opróżniasz zbiornik i nalewasz do niego czystej wody. Co masz zrobić tuż przed rozłożeniem pompki na drobne części?', options: ['Przepompować wodę, aż zacznie lecieć całkowicie czysta woda bez resztek syropu czy sosu.', 'Zanurzyć całą pompkę w płynie dezynfekującym na 10 minut.', 'Użyć małej szczotki nr 20 wewnątrz cylindra.', 'Odciąć dopływ wody na zmywaku.'], correct: [0] },
+                { id: 's4', type: 'single', q: 'O czym musisz rygorystycznie pamiętać podczas mycia zdemontowanych drobnych elementów pompki na zmywaku (krok 7)?', options: ['Że woda musi mieć powyżej 90 stopni Celsjusza.', 'Aby bardzo uważać na zgubienie drobnych części (zaworów, uszczelek).', 'Żeby absolutnie nie używać żadnych szczotek na elementach plastikowych.', 'Aby zmontować ją mokrą, żeby łatwiej weszła na gwint.'], correct: [1] },
+                { id: 'f19', type: 'single', q: 'Przeprowadzasz rozliczenie kasy. Jaki jest maksymalny dopuszczalny limit gotówki w szufladzie oraz ile wynosi kwota akceptowalnego manka na Twojej zmianie?', options: ['1500 zł w szufladzie / 10 zł manka', '2500 zł w szufladzie / 0 zł manka', '2000 zł w szufladzie / 5 zł manka', '2000 zł w szufladzie / 2 zł manka'], correct: [2] },
+                { id: 'f20', type: 'single', q: 'Audytor sprawdza szufladę kasjera. Znajduje w przegródkach łączną kwotę 900 zł, ale zauważa tam dwa banknoty 100 PLN oraz jeden 200 PLN. Jaki błąd bezpieczeństwa wskaże?', options: ['Żaden, kwota przecież nie przekracza limitu 2000 zł.', 'Wszystkie banknoty o nominałach 100, 200 i 500 PLN powinny znajdować się wyłącznie w zabezpieczonym drop boxie.', 'Złamano zasadę, że w szufladzie może znajdować się maksymalnie tylko jeden banknot 200 PLN.', 'Wysokie nominały muszą leżeć schowane bezpośrednio pod bilonem.'], correct: [1] },
+                { id: 'f21', type: 'single', q: 'Podczas autoryzacji płatności stolikowej na terminalu bezprzewodowym wyskakuje nagle rzadki komunikat „Zatrzymaj kartę". Co jest Twoim absolutnym obowiązkiem?', options: ['Zwrócenie karty Gościowi i poproszenie go o zapłatę odliczoną gotówką.', 'Spróbowanie autoryzacji jeszcze dwa razy, by sprawdzić błąd w systemie.', 'Niezwłoczne powiadomienie Managera, który musi sporządzić oficjalny protokół zatrzymania karty.', 'Zatrzymanie karty, wrzucenie jej do sejfu i wyproszenie Gościa z restauracji.'], correct: [2] },
+                { id: 'f22', type: 'single', q: 'Gość odebrał zamówienie, ale zostawił na ladzie paragon, na którym wydrukowało się zaproszenie do ankiety GFP. Co bezwzględnie nakazuje procedura Fraud Prevention (zapobiegania nadużyciom)?', options: ['Paragon must zostać zgnieciony i wrzucony do zwykłego kosza.', 'Zaproszenie musi zostać niezwłocznie zniszczone i zutylizowane w sposób absolutnie uniemożliwiający jego późniejsze użycie.', 'Należy nabić na to zaproszenie Twistera w ramach darmowego posiłku pracowniczego.', 'Manager chowa paragon do biura w celach archiwalnych.'], correct: [1] },
+                { id: 'f23', type: 'single', q: 'Kiedy Gość chce odebrać nagrodę z wypełnionej ankiety GFP, co musi z fizycznym zaproszeniem (paragonem) zrobić Manager, aby zatwierdzić operację na kasie bez ryzyka kary na audycie?', options: ['Zaproszenie musi zostać od razu wyrzucone do kosza.', 'Zaproszenie trzeba przekazać do biura bez żadnej ingerencji.', 'Zaproszenie musi zostać przedarte lub przedziurawione, a następnie przechowywane w dokumentach tygodniowych przez 3 miesiące.', 'Na zaproszeniu Manager musi wpisać dokładną godzinę i swój numer personalny.'], correct: [2] },
+                { id: 'f24', type: 'single', q: 'Pracujesz na serwisie, zajmując się uzupełnianiem kartoników na frytki. Słyszysz sygnał tzw. "Red button" z biura. Co to oznacza i co robisz zgodnie ze standardem?', options: ['Jest to alarm ewakuacyjny i natychmiast kierujesz się do wyjścia.', 'Oznacza to nagłe zwiększenie ruchu (np. weszła wycieczka) - od razu przerywasz przygotowywanie pudełek i skupiasz się na pełnej obsłudze przy stole przygotowywania zamówień.', 'To sygnał zarezerwowany dla Managera Zmiany, by sprawdził kamery, Ty pracujesz normalnie.', 'Przyszedł dostawca towaru i musisz iść na rampę.'], correct: [1] },
+                { id: 'f25', type: 'single', q: 'Trwa pierwsza godzina działania restauracji albo godzina tuż przed zamknięciem. Zgodnie z wytycznymi dostępności dla FOH, jakich flagowych produktów z kurczaka na pewno NIE ZNAJDZIESZ gotowych na holdingu, bo są robione wyłącznie na życzenie?', options: ['Kurczak TMOR (kawałki).', 'Hot Wings.', 'Strips i 1 Zinger.', 'Bites i np. kanapki Grander/Twister.'], correct: [3] }
             ],
             serwis: [
-                { id: 's1', type: 'single', q: 'Co robimy z produktem na zsuwni (chute), który przekroczył dozwolony czas przetrzymywania (Hold Time)?', options: ['Natychmiast spisujemy na straty (Waste) i wyrzucamy', 'Przesmażamy ponownie, by odzyskał chrupkość', 'Mieszamy ze świeżo wysmażoną partią z chłodni'], correct: [0] },
-                { id: 's2', type: 'single', q: 'Jaka jest podstawowa funkcja zsuwni (chute) w strefie pakowania?', options: ['Służy do przechowywania zapasów napojów', 'Utrzymuje odpowiednią temperaturę i rotację gotowych produktów przed wydaniem', 'Jest miejscem odkładania brudnych tacek'], correct: [1] },
-                { id: 's3', type: 'multi', q: 'Jakie elementy muszą obowiązkowo znaleźć się w torbie z zamówieniem na wynos? (zaznacz wszystkie)', options: ['Zamówione produkty i odpowiednia liczba serwetek', 'Paragon/rachunek fiskalny', 'Karta lojalnościowa innego klienta'], correct: [0, 1] }
+                { id: 's1', type: 'single', q: 'Co robimy z produktem na zsuwni (chute), który przekroczył dozwolony czas przetrzymywania (Hold Time)?', options: ['Natychmiast spisujemy na straty (Waste) i wyrzucamy', 'Przesmażamy ponownie, by odzyskał chrupkość', 'Mieszamy ze świeżo wysmażoną partią z chłodni', 'Zostawiamy na zsuwni do końca piku'], correct: [0] },
+                { id: 's2', type: 'single', q: 'Jaka jest podstawowa funkcja zsuwni (chute) w strefie pakowania?', options: ['Służy do przechowywania zapasów napojów', 'Utrzymuje odpowiednią temperaturę i rotację gotowych produktów przed wydaniem', 'Jest miejscem odkładania brudnych tacek', 'Służy jako strefa pakowania zabawek'], correct: [1] },
+                { id: 's3', type: 'single', q: 'Co musi obowiązkowo znaleźć się w torbie z zamówieniem na wynos na serwisie?', options: ['Zamówione produkty, odpowiednia ilość serwetek oraz paragon', 'Tylko zamówione produkty', 'Zamówione produkty i losowy kupon rabatowy', 'Produkty, serwetki i wizytówka managera'], correct: [0] },
+                { id: 's4', type: 'single', q: 'Jakie urządzenie na serwisie odpowiada za utrzymanie temperatury i wilgotności bułek do kanapek (np. Grander, Twister)?', options: ['Opiekacz tosterowy', 'Szuflada grzewcza na bułki (Bun Warmer)', 'Kuchenka mikrofalowa', 'Chłodnia podręczna'], correct: [1] },
+                { id: 's5', type: 'single', q: 'Jaka jest złota zasada pakowania produktów do torby na wynos (Take-away)?', options: ['Najcięższe i najgorętsze produkty na spód, delikatne i zimne na samą górę', 'Układamy losowo, jak najszybciej', 'Zimne napoje kładziemy bezpośrednio na gorące kubełki', 'Wszystkie produkty zawijamy w folię aluminiową'], correct: [0] }
             ]
         }
     };
 
-    // PARAMETRY GENEROWANIA TESTU
-    const CONFIG = {
-        generalCount: 2, // Ile pytań ogólnych wylosować
-        roleCount: 2    // Ile pytań stanowiskowych wylosować
-    };
+    const questionsDictionary = {};
+    questionBank.general.forEach(q => questionsDictionary[q.id] = q.q);
+    Object.values(questionBank.roles).flat().forEach(q => questionsDictionary[q.id] = q.q);
 
-    // Słownik do wyświetlania ról z Wielkiej Litery
-    const roleDisplayNames = {
-        kuchnia: "Kuchnia",
-        front: "Front",
-        serwis: "Serwis"
-    };
-
-    // STAN SYSTEMU
+    // STAN APLIKACJI
     let appState = {
-        name: '',
-        role: '',
-        questions: [], // połączona lista pytań
-        currentIndex: 0,
-        answers: {}
+        name: '', role: '', questions: [], currentIndex: 0,
+        answers: {}, isQuizActive: false, cheatFlags: 0,
+        wrongIds: [],
+        rawResultsData: []
     };
 
-    // INICJALIZACJA SYSTEMU PO ZAŁADOWANIU DOM
+    let questionTimer;
+    let timeLeft;
+
+    // --- SYSTEM ANTI-CHEAT ---
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.addEventListener('copy', event => {
+        event.preventDefault();
+        showToast('Kopiowanie treści zablokowane!', true);
+    });
+
+    function handleVisibilityChange() {
+        if (appState.isQuizActive && (document.hidden || document.visibilityState === 'hidden')) {
+            appState.cheatFlags++;
+            showToast('⚠️ WYKRYTO OPUSZCZENIE TESTU! WYNIK OFLAGOWANY!', true);
+        }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', () => {
+        if(appState.isQuizActive) {
+            appState.cheatFlags++;
+            showToast('⚠️ WYKRYTO OPUSZCZENIE OKNA! WYNIK OFLAGOWANY!', true);
+        }
+    });
+
     window.onload = function() {
         loadLeaderboard();
+        checkResumedSession();
     };
 
-    // FUNKCJA: Pobieranie rankingu TOP 5 z arkusza z Cache Busterem
+    function checkResumedSession() {
+        const saved = sessionStorage.getItem('kfc_quiz_session');
+        if (saved) {
+            const data = JSON.parse(saved);
+            if (confirm("System wykrył zapisaną sesję testu dla: " + data.name + ". Kontynuować?")) {
+                appState = data;
+                document.getElementById('screen-start').classList.add('hidden');
+                document.getElementById('screen-quiz').classList.remove('hidden');
+                renderQuestion();
+            } else {
+                sessionStorage.removeItem('kfc_quiz_session');
+            }
+        }
+    }
+
+    function saveSessionState() { if (appState.isQuizActive) sessionStorage.setItem('kfc_quiz_session', JSON.stringify(appState)); }
+    function clearSessionState() { sessionStorage.removeItem('kfc_quiz_session'); }
+
+    // RANKING TOP 5
     function loadLeaderboard() {
+        if (!WEB_APP_URL.includes('/exec')) return;
+
         const loadingEl = document.getElementById('leaderboard-loading');
         const emptyEl = document.getElementById('leaderboard-empty');
         const listEl = document.getElementById('leaderboard-list');
-
-        // Unikalny timestamp wymusza na przeglądarce ominięcie cache
         const cacheBusterUrl = WEB_APP_URL + "?nocache=" + new Date().getTime();
 
-        fetch(cacheBusterUrl)
-            .then(res => res.json())
-            .then(data => {
-                loadingEl.classList.add('hidden');
-                
-                if(!data || data.length === 0) {
-                    emptyEl.classList.remove('hidden');
-                    return;
-                }
+        fetch(cacheBusterUrl).then(res => res.json()).then(data => {
+            loadingEl.classList.add('hidden');
+            if(!data || data.length === 0) return emptyEl.classList.remove('hidden');
 
-                // Bezpieczne i inteligentne filtrowanie wierszy z błędami w arkuszu
-                const cleanData = data.filter(user => 
-                    user.name && 
-                    !user.name.includes('❌') && 
-                    !user.name.includes('BŁĄD') && 
-                    !user.name.includes('SYSTEM') && 
-                    !isNaN(user.score)
-                );
+            const cleanData = data.filter(user => user.name && !user.name.includes('❌') && !user.name.includes('BŁĄD') && !user.name.includes('SYSTEM') && !isNaN(user.score));
+            if(cleanData.length === 0) return emptyEl.classList.remove('hidden');
 
-                if(cleanData.length === 0) {
-                    emptyEl.classList.remove('hidden');
-                    return;
-                }
+            cleanData.sort((a,b) => b.score - a.score);
+            const top5 = cleanData.slice(0, 5);
+            
+            let html = '';
+            top5.forEach((user, index) => {
+                let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤';
+                const roleText = roleDisplayNames[user.role] || user.role;
+                const isFlagged = user.name.includes('🚩');
+                const nameColor = isFlagged ? 'text-red-400' : 'text-white';
 
-                // Bezpieczne przycinanie tylko do TOP 5 wyników
-                const top5 = cleanData.slice(0, 5);
-
-                let html = '';
-                top5.forEach((user, index) => {
-                    let medal = '👤';
-                    if(index === 0) medal = '🥇';
-                    else if(index === 1) medal = '🥈';
-                    else if(index === 2) medal = '🥉';
-
-                    const roleText = roleDisplayNames[user.role] || user.role;
-
-                    html += `
-                        <div class="flex items-center justify-between p-3 bg-zinc-950/60 border border-purple-950/80 rounded-xl shadow-[inset_0_0_8px_rgba(139,92,246,0.05)]">
-                            <div class="flex items-center gap-3">
-                                <span class="text-xl">${medal}</span>
-                                <div>
-                                    <p class="font-bold text-white text-sm">${escapeHtml(user.name)}</p>
-                                    <p class="text-xs text-purple-300/65">${escapeHtml(roleText)}</p>
-                                </div>
+                html += `
+                    <div class="flex items-center justify-between p-3 bg-zinc-950/60 border border-purple-950/80 rounded-xl shadow-[inset_0_0_8px_rgba(139,92,246,0.05)]">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">${medal}</span>
+                            <div>
+                                <p class="font-bold ${nameColor} text-sm">${escapeHtml(user.name)}</p>
+                                <p class="text-xs text-purple-300/65">${escapeHtml(roleText)}</p>
                             </div>
-                            <span class="font-black text-purple-400 text-sm text-shadow-[0_0_5px_rgba(168,85,247,0.3)]">${parseInt(user.score)}%</span>
                         </div>
-                    `;
-                });
-
-                listEl.innerHTML = html;
-                listEl.classList.remove('hidden');
-            })
-            .catch(err => {
-                loadingEl.innerText = "Nie udało się wczytać rankingu.";
-                console.error("Błąd ładowania rankingu:", err);
+                        <span class="font-black text-purple-400 text-sm text-shadow-[0_0_5px_rgba(168,85,247,0.3)]">${parseInt(user.score)}%</span>
+                    </div>
+                `;
             });
+            listEl.innerHTML = html;
+            listEl.classList.remove('hidden');
+        }).catch(err => {
+            loadingEl.innerText = "Brak połączenia z bazą (Sprawdź poprawność URL w kodzie HTML).";
+        });
     }
 
-    // SYSTEM POWIADOMIEŃ TOAST
     function showToast(message, isError = false) {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = `p-4 rounded-xl text-sm font-semibold text-white shadow-[0_0_15px_rgba(0,0,0,0.5)] flex items-center gap-2 transform translate-y-2 opacity-0 transition-all duration-300 pointer-events-auto ${
             isError ? 'bg-red-950/90 border border-red-500/70 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'bg-purple-950/90 border border-purple-500/70 shadow-[0_0_15px_rgba(168,85,247,0.25)]'
         }`;
-        toast.innerHTML = `
-            <span>${isError ? '⚠️' : '🔮'}</span>
-            <span>${message}</span>
-        `;
+        toast.innerHTML = `<span>${isError ? '⚠️' : '🔮'}</span><span>${message}</span>`;
         container.appendChild(toast);
-
-        // Wyzwalanie animacji wejścia
-        setTimeout(() => {
-            toast.classList.remove('translate-y-2', 'opacity-0');
-        }, 10);
-
-        // Usuwanie toastu po 3.5 sekundy
-        setTimeout(() => {
-            toast.classList.add('opacity-0', 'translate-y-[-8px]');
-            setTimeout(() => toast.remove(), 300);
-        }, 3500);
+        setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+        setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-[-8px]'); setTimeout(() => toast.remove(), 300); }, 3500);
     }
 
-    // POMOCNIK: Mieszanie i wybieranie pytań
-    function selectRandom(arr, count) {
-        const shuffled = [...arr].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, count);
-    }
-
-    // OBSŁUGA ROZPOCZĘCIA TESTU
+    // ROZPOCZĘCIE TESTU
     document.getElementById('btn-start').addEventListener('click', () => {
+        if (!WEB_APP_URL.includes('/exec')) {
+            showToast('Skonfiguruj WEB_APP_URL w kodzie strony!', true); return;
+        }
+
         const nameInput = document.getElementById('userName').value.trim();
         const roleInput = document.getElementById('userRole').value;
-
-        // Walidacja zapisu: "Imię N." lub "Imię N" (Litery polskie, spacja, jedna litera, opcjonalna kropka)
         const nameRegex = /^[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż\-']+\s[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]\.?$/;
 
-        if(!nameInput) {
-            showToast('Proszę podać swoje imię i inicjał nazwiska!', true);
-            return;
+        if(!nameInput || !nameRegex.test(nameInput)) { 
+            showToast('Wpisz imię i pierwszą literę nazwiska (np. Jan K.)!', true); return; 
+        }
+        if(!roleInput) { 
+            showToast('Proszę wybrać stanowisko!', true); return; 
         }
 
-        if(!nameRegex.test(nameInput)) {
-            showToast('Wpisz imię i tylko pierwszą literę nazwiska (np. Jan K.)!', true);
-            return;
-        }
+        appState.name = nameInput; appState.role = roleInput; appState.isQuizActive = true; 
+        appState.wrongIds = [];
 
-        if(!roleInput) {
-            showToast('Proszę wybrać stanowisko!', true);
-            return;
-        }
-
-        appState.name = nameInput;
-        appState.role = roleInput;
-
-        // Dobieranie pytań
-        const generalSelected = selectRandom(questionBank.general, CONFIG.generalCount).map(q => ({...q, category: 'general'}));
-        const roleSelected = selectRandom(questionBank.roles[roleInput], CONFIG.roleCount).map(q => ({...q, category: 'role'}));
+        const generalSelected = [...questionBank.general].sort(() => 0.5 - Math.random()).slice(0, CONFIG.generalCount).map(q => ({...q, category: 'general'}));
+        const roleSelected = [...questionBank.roles[roleInput]].sort(() => 0.5 - Math.random()).slice(0, CONFIG.roleCount).map(q => ({...q, category: 'role'}));
 
         appState.questions = [...generalSelected, ...roleSelected];
-        appState.currentIndex = 0;
-        appState.answers = {};
+        appState.currentIndex = 0; appState.answers = {};
 
-        // Przełączenie ekranów
+        saveSessionState();
+
         document.getElementById('screen-start').classList.add('hidden');
         document.getElementById('screen-quiz').classList.remove('hidden');
 
         renderQuestion();
     });
 
-    // ELEMENTY INTERFEJSU QUIZU
-    const questionContainer = document.getElementById('question-container');
-    const btnNext = document.getElementById('btn-next');
-    const btnPrev = document.getElementById('btn-prev');
+    // TIMER
+    function startTimer() {
+        clearInterval(questionTimer);
+        timeLeft = CONFIG.timePerQuestion;
+        updateTimerUI();
+        
+        questionTimer = setInterval(() => {
+            timeLeft--;
+            updateTimerUI();
+            if(timeLeft <= 0) {
+                clearInterval(questionTimer);
+                handleTimeOut();
+            }
+        }, 1000);
+    }
 
-    // RENDERING AKTUALNEGO PYTANIA
+    // Odświeżenie timera
+    function updateTimerUI() {
+        const timerEl = document.getElementById('timer-display');
+        timerEl.innerText = `⏱️ ${timeLeft}s`;
+        if(timeLeft <= 10) {
+            timerEl.classList.remove('text-purple-300', 'border-purple-800/50');
+            timerEl.classList.add('text-red-500', 'border-red-500', 'animate-pulse');
+        } else {
+            timerEl.classList.add('text-purple-300', 'border-purple-800/50');
+            timerEl.classList.remove('text-red-500', 'border-red-500', 'animate-pulse');
+        }
+    }
+
+    function handleTimeOut() {
+        showToast('⏰ Czas minął! Pytanie pominięte.', true);
+        if(!appState.answers[appState.questions[appState.currentIndex].id]) {
+            appState.answers[appState.questions[appState.currentIndex].id] = [];
+        }
+        advanceQuestion();
+    }
+
+    function advanceQuestion() {
+        clearInterval(questionTimer);
+        if(appState.currentIndex < appState.questions.length - 1) {
+            appState.currentIndex++;
+            saveSessionState();
+            renderQuestion();
+        } else {
+            finishAndSubmit();
+        }
+    }
+
     function renderQuestion() {
         const qData = appState.questions[appState.currentIndex];
         const isMulti = qData.type === 'multi';
         const saved = appState.answers[qData.id] || [];
-        const roleNameDisplay = roleDisplayNames[appState.role] || appState.role;
 
-        // Aktualizacja postępu i liczników
         document.getElementById('question-counter').innerText = `Pytanie ${appState.currentIndex + 1} z ${appState.questions.length}`;
         document.getElementById('progress').style.width = `${(appState.currentIndex / appState.questions.length) * 100}%`;
-        document.getElementById('question-category').innerText = qData.category === 'general' ? 'Wiedza ogólna' : `Stanowisko: ${roleNameDisplay}`;
-
-        btnPrev.classList.toggle('hidden', appState.currentIndex === 0);
-        btnNext.innerText = appState.currentIndex === appState.questions.length - 1 ? 'Zakończ i Wyślij' : 'Dalej';
+        document.getElementById('question-category').innerText = qData.category === 'general' ? 'Wiedza ogólna' : `Stanowisko: ${roleDisplayNames[appState.role]}`;
+        document.getElementById('btn-next').innerText = appState.currentIndex === appState.questions.length - 1 ? 'Zakończ Test' : 'Zatwierdź i przejdź Dalej';
 
         let html = `
             <h3 class="text-lg md:text-xl font-bold text-white mb-2 relative z-20">${qData.q}</h3>
-            <p class="text-xs text-purple-300/60 mb-5 relative z-20">${isMulti ? '👉 Zaznacz wszystkie pasujące odpowiedzi (wielokrotny wybór)' : '👉 Wybierz tylko jedną prawidłową odpowiedź'}</p>
+            <p class="text-xs text-purple-300/60 mb-5 relative z-20">${isMulti ? '👉 Zaznacz wszystkie pasujące (wielokrotny wybór)' : '👉 Wybierz jedną odpowiedź'}</p>
             <div class="space-y-3 relative z-20">
         `;
 
         qData.options.forEach((opt, idx) => {
             const isChecked = saved.includes(idx);
             const inputType = isMulti ? 'checkbox' : 'radio';
-
             html += `
                 <label class="option-card flex items-center p-4 rounded-xl cursor-pointer ${isChecked ? 'selected' : ''}">
                     <input type="${inputType}" name="q_opt" value="${idx}" class="w-5 h-5 text-purple-600 bg-zinc-900 border-purple-800 rounded focus:ring-purple-500 accent-purple-500 mr-4" ${isChecked ? 'checked' : ''} onchange="registerChoice()">
@@ -480,12 +555,12 @@
                 </label>
             `;
         });
-
         html += '</div>';
-        questionContainer.innerHTML = html;
+        document.getElementById('question-container').innerHTML = html;
+        
+        startTimer();
     }
 
-    // REJESTROWANIE WYBORU UŻYTKOWNIKA
     window.registerChoice = function() {
         const qData = appState.questions[appState.currentIndex];
         const inputs = document.querySelectorAll('input[name="q_opt"]');
@@ -500,112 +575,228 @@
                 card.classList.remove('selected');
             }
         });
-
         appState.answers[qData.id] = selectedIndices;
     };
 
-    // PRZYCISKI NAWIGACJI
-    btnNext.addEventListener('click', () => {
-        const qData = appState.questions[appState.currentIndex];
-        const answersForQ = appState.answers[qData.id] || [];
-
-        if(answersForQ.length === 0) {
-            showToast('Zaznacz odpowiedź, aby przejść dalej!', true);
+    document.getElementById('btn-next').addEventListener('click', () => {
+        const isAnswered = (appState.answers[appState.questions[appState.currentIndex].id] || []).length > 0;
+        if(!isAnswered) {
+            showToast('Zaznacz odpowiedź przed przejściem dalej!', true);
             return;
         }
-
-        if(appState.currentIndex < appState.questions.length - 1) {
-            appState.currentIndex++;
-            renderQuestion();
-        } else {
-            finishAndSubmit();
-        }
+        advanceQuestion();
     });
 
-    btnPrev.addEventListener('click', () => {
-        if(appState.currentIndex > 0) {
-            appState.currentIndex--;
-            renderQuestion();
-        }
-    });
-
-    // ZAPIS I PODSUMOWANIE WYNIKÓW
+    // WYSYŁANIE WYNIKÓW I TRACKING BŁĘDÓW
     function finishAndSubmit() {
-        let generalCorrect = 0;
-        let generalTotal = 0;
-        let roleCorrect = 0;
-        let roleTotal = 0;
+        clearInterval(questionTimer);
+        appState.isQuizActive = false; 
+        clearSessionState();
+
+        let generalCorrect = 0, generalTotal = 0, roleCorrect = 0, roleTotal = 0;
+        appState.wrongIds = [];
 
         appState.questions.forEach(q => {
             const userSelection = (appState.answers[q.id] || []).sort();
             const correctSelection = [...q.correct].sort();
             const isCorrect = JSON.stringify(userSelection) === JSON.stringify(correctSelection);
 
-            if(q.category === 'general') {
-                generalTotal++;
-                if(isCorrect) generalCorrect++;
-            } else {
-                roleTotal++;
-                if(isCorrect) roleCorrect++;
+            if (!isCorrect) {
+                appState.wrongIds.push(q.id);
             }
+
+            if(q.category === 'general') { generalTotal++; if(isCorrect) generalCorrect++; } 
+            else { roleTotal++; if(isCorrect) roleCorrect++; }
         });
 
-        const totalPoints = generalCorrect + roleCorrect;
-        const totalMax = generalTotal + roleTotal;
-        const percentage = Math.round((totalPoints / totalMax) * 100);
+        const percentage = Math.round(((generalCorrect + roleCorrect) / (generalTotal + roleTotal)) * 100);
 
-        const genPercent = generalTotal > 0 ? Math.round((generalCorrect / generalTotal) * 100) : 0;
-        const rolePercent = roleTotal > 0 ? Math.round((roleCorrect / roleTotal) * 100) : 0;
-
-        // Wyświetlenie wyników w UI
         document.getElementById('result-name').innerText = appState.name;
-        document.getElementById('result-general').innerText = `${generalCorrect}/${generalTotal} (${genPercent}%)`;
-        document.getElementById('result-role').innerText = `${roleCorrect}/${roleTotal} (${rolePercent}%)`;
+        document.getElementById('result-general').innerText = `${generalCorrect}/${generalTotal} (${generalTotal > 0 ? Math.round((generalCorrect / generalTotal) * 100) : 0}%)`;
+        document.getElementById('result-role').innerText = `${roleCorrect}/${roleTotal} (${roleTotal > 0 ? Math.round((roleCorrect / roleTotal) * 100) : 0}%)`;
         document.getElementById('result-total').innerText = `${percentage}%`;
 
-        // Przełączenie ekranu na wynik końcowy
+        if(appState.cheatFlags > 0) document.getElementById('cheat-warning').classList.remove('hidden');
+
         document.getElementById('screen-quiz').classList.add('hidden');
         document.getElementById('screen-result').classList.remove('hidden');
-
-        // WYSYŁKA DANYCH DO GOOGLE SHEETS
         showToast('Wysyłanie wyniku do bazy danych...');
 
-        // Trikiem omijającym absolutnie wszystkie cache przeglądarki jest dodanie do linku parametru ?t=timestamp
-        // Dzięki temu przeglądarka uzna, że wysyła dane na nowy adres i użyje świeżego kodu.
+        let finalName = appState.name;
+        if(appState.cheatFlags > 0) finalName += ` 🚩 (Utrata focusu: ${appState.cheatFlags}x)`;
+
+        const wrongIdsString = appState.wrongIds.join(", ");
+        
+        const payloadData = { 
+            name: finalName, 
+            role: appState.role, 
+            score: percentage,
+            wrongIds: wrongIdsString
+        };
+
         const noCacheSubmitUrl = WEB_APP_URL + "?t=" + new Date().getTime();
 
         fetch(noCacheSubmitUrl, {
             method: 'POST',
             mode: 'no-cors', 
-            headers: {
-                'Content-Type': 'text/plain'
-            },
-            body: JSON.stringify({
-                name: appState.name,
-                role: appState.role,
-                score: percentage
-            })
-        })
-        .then(() => {
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payloadData)
+        }).then(() => {
             showToast('Wynik pomyślnie zapisany w chmurze!');
-            // Odświeżamy ranking w tle, aby od razu zobaczyć zaktualizowaną tabelę liderów
             setTimeout(loadLeaderboard, 1500);
-        })
-        .catch(err => {
-            showToast('Błąd połączenia. Wynik nie został zapisany.', true);
-            console.error('Błąd zapisu sieciowego:', err);
+        }).catch(err => {
+            showToast('Błąd połączenia z serwerem.', true);
         });
     }
 
-    // Bezpieczne renderowanie tekstu (XSS Protection)
+    // --- SYSTEM UKRYTEGO PANELU MANAGERA ---
+    let logoClicks = 0;
+    function triggerManagerCheck() {
+        logoClicks++;
+        if (logoClicks >= 3) {
+            logoClicks = 0;
+            const pin = prompt("Wprowadź kod dostępu Managera:");
+            if (pin === "2137") {
+                showManagerPanel();
+            } else if (pin !== null) {
+                alert("Niepoprawny PIN dostępu.");
+            }
+        }
+    }
+
+    function showManagerPanel() {
+        document.getElementById('screen-start').classList.add('hidden');
+        document.getElementById('screen-manager').classList.remove('hidden');
+        loadManagerData();
+    }
+
+    function closeManager() {
+        document.getElementById('screen-manager').classList.add('hidden');
+        document.getElementById('screen-start').classList.remove('hidden');
+    }
+
+    function switchManagerTab(tab) {
+        if(tab === 'users') {
+            document.getElementById('tab-users').className = "flex-1 py-2 font-semibold text-sm tab-active transition-colors";
+            document.getElementById('tab-stats').className = "flex-1 py-2 font-semibold text-sm tab-inactive transition-colors";
+            document.getElementById('view-users').classList.remove('hidden');
+            document.getElementById('view-stats').classList.add('hidden');
+        } else {
+            document.getElementById('tab-users').className = "flex-1 py-2 font-semibold text-sm tab-inactive transition-colors";
+            document.getElementById('tab-stats').className = "flex-1 py-2 font-semibold text-sm tab-active transition-colors";
+            document.getElementById('view-users').classList.add('hidden');
+            document.getElementById('view-stats').classList.remove('hidden');
+            renderManagerStats();
+        }
+    }
+
+    function loadManagerData() {
+        const listEl = document.getElementById('manager-list');
+        listEl.innerHTML = `<div class="text-center py-8 text-purple-300/40 animate-pulse">Pobieranie bazy danych z chmury Google...</div>`;
+
+        const cacheBusterUrl = WEB_APP_URL + "?nocache=" + new Date().getTime();
+
+        fetch(cacheBusterUrl).then(res => res.json()).then(data => {
+            appState.rawResultsData = data;
+            renderManagerList(data);
+            if(!document.getElementById('view-stats').classList.contains('hidden')) {
+                renderManagerStats();
+            }
+        }).catch(err => {
+            listEl.innerHTML = `<div class="text-center py-8 text-red-500">Zaktualizuj kod w Google Apps Script. (Brak 5 kolumny lub stary link)</div>`;
+        });
+    }
+
+    function renderManagerList(data) {
+        const listEl = document.getElementById('manager-list');
+        const searchTerm = document.getElementById('manager-search').value.toLowerCase().trim();
+        const filterVal = document.getElementById('manager-filter').value;
+
+        let filtered = data.filter(user => user.name && !user.name.includes('❌') && !user.name.includes('BŁĄD'));
+
+        if (searchTerm) filtered = filtered.filter(user => user.name.toLowerCase().includes(searchTerm));
+        if (filterVal === 'cheaters') filtered = filtered.filter(user => user.name.includes('🚩'));
+        else if (filterVal !== 'all') filtered = filtered.filter(user => user.role.toLowerCase() === filterVal);
+
+        if (filtered.length === 0) {
+            listEl.innerHTML = `<div class="text-center py-8 text-zinc-500">Brak dopasowań w bazie danych.</div>`;
+            return;
+        }
+
+        filtered = filtered.reverse();
+
+        let html = '';
+        filtered.forEach(user => {
+            const isFlagged = user.name.includes('🚩');
+            const nameColor = isFlagged ? 'text-red-400' : 'text-white';
+            const roleName = roleDisplayNames[user.role] || user.role;
+            const wrongCount = user.wrongIds ? user.wrongIds.split(',').filter(x => x.trim()).length : 0;
+
+            html += `
+                <div class="p-2.5 bg-zinc-900/80 border ${isFlagged ? 'border-red-950 bg-red-950/5' : 'border-zinc-800'} rounded-lg">
+                    <div class="flex justify-between items-center mb-1">
+                        <p class="font-bold ${nameColor}">${escapeHtml(user.name)}</p>
+                        <span class="font-bold ${parseInt(user.score) >= 75 ? 'text-green-400' : 'text-red-400'}">${parseInt(user.score)}%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xxs">
+                        <span class="text-zinc-500 capitalize">${escapeHtml(roleName)}</span>
+                        <span class="text-purple-400/80">Błędów: ${wrongCount}</span>
+                    </div>
+                </div>
+            `;
+        });
+        listEl.innerHTML = html;
+    }
+
+    function renderManagerStats() {
+        const statsEl = document.getElementById('manager-stats-list');
+        let errorCounts = {};
+
+        appState.rawResultsData.forEach(user => {
+            if(user.wrongIds && typeof user.wrongIds === 'string') {
+                user.wrongIds.split(',').forEach(id => {
+                    let cleanId = id.trim();
+                    if(cleanId) {
+                        errorCounts[cleanId] = (errorCounts[cleanId] || 0) + 1;
+                    }
+                });
+            }
+        });
+
+        let sortedErrors = Object.keys(errorCounts).map(id => {
+            return { id: id, count: errorCounts[id], questionText: questionsDictionary[id] || 'Nieznane pytanie' };
+        }).sort((a, b) => b.count - a.count);
+
+        if(sortedErrors.length === 0) {
+            statsEl.innerHTML = `<div class="text-center py-8 text-zinc-500">Załoga nie popełniła jeszcze żadnych błędów!</div>`;
+            return;
+        }
+
+        let html = '';
+        sortedErrors.forEach(err => {
+            html += `
+                <div class="p-3 bg-zinc-900/50 border border-purple-950/50 rounded-lg flex items-start gap-3">
+                    <div class="flex flex-col items-center justify-center bg-red-950/30 border border-red-900/50 rounded px-2 py-1 min-w-[3rem]">
+                        <span class="text-xs text-zinc-400">Błędy</span>
+                        <span class="text-lg font-black text-red-400">${err.count}</span>
+                    </div>
+                    <div class="text-xs text-zinc-300 pt-0.5 leading-snug">
+                        ${escapeHtml(err.questionText)}
+                    </div>
+                </div>
+            `;
+        });
+        statsEl.innerHTML = html;
+    }
+
+    document.getElementById('manager-search').addEventListener('input', () => renderManagerList(appState.rawResultsData));
+    document.getElementById('manager-filter').addEventListener('change', () => renderManagerList(appState.rawResultsData));
+
     function escapeHtml(text) {
         if (!text) return '';
-        return text.toString()
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+        return text.toString().replace(/[&<>"']/g, function(m) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+        });
     }
 </script>
 
